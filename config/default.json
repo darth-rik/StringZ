@@ -1,0 +1,4 @@
+{
+	"mongoURI": "mongodb+srv://Rik:zaxvHY3dYV8Lzqy@stringz.fr4hr.mongodb.net/test?retryWrites=true&w=majority",
+	"jwtSecret": "stringzsecrettoken"
+}
