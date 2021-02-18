@@ -5,6 +5,13 @@ const PostSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "User",
 	},
+
+	name: {
+		type: String,
+	},
+	avatar: {
+		type: String,
+	},
 	text: {
 		type: String,
 		required: true,
@@ -26,9 +33,16 @@ const PostSchema = new mongoose.Schema({
 				ref: "User",
 			},
 
+			name: {
+				type: String,
+			},
+
 			text: {
 				type: String,
 				required: true,
+			},
+			avatar: {
+				type: String,
 			},
 			date: {
 				type: Date,
