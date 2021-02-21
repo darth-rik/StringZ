@@ -122,8 +122,31 @@ router.put("/like/:id", auth, async (req, res) => {
 		}
 
 		post.likes.unshift({ user: req.user.id });
-
 		await post.save();
+
+		//Create a like notification
+
+		const recipient = await Profile.findOne({ user: post.user });
+
+		const currentUser = await Profile.findOne({ user: req.user.id });
+
+		//Check if like is made by the current user
+		if (recipient.user.toString() !== req.user.id) {
+			const likeNotif = {
+				read: false,
+
+				userId: req.user.id,
+
+				post: req.params.id,
+
+				name: currentUser.artistName,
+				avatar: currentUser.photo,
+			};
+
+			recipient.notification.likeNotif.unshift(likeNotif);
+
+			await recipient.save();
+		}
 
 		res.json(post.likes);
 	} catch (err) {
@@ -188,8 +211,32 @@ router.post(
 				avatar: user.photo,
 				user: req.user.id,
 			};
+
 			post.comments.unshift(newComment);
 			await post.save();
+
+			//Create a comment notification
+
+			const recipient = await Profile.findOne({ user: post.user });
+
+			//Check if comment is made by the current user
+			if (recipient.user.toString() !== req.user.id) {
+				const commentNotif = {
+					read: false,
+
+					userId: req.user.id,
+
+					post: req.params.id,
+
+					name: user.artistName,
+					avatar: user.photo,
+				};
+
+				recipient.notification.commentNotif.unshift(commentNotif);
+
+				await recipient.save();
+			}
+
 			res.json(post.comments);
 		} catch (error) {
 			console.error(error.message);

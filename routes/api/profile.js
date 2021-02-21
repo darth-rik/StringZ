@@ -115,16 +115,30 @@ router.post("/", [
 //@desc    Search profiles by name
 //@access  Private
 
-router.get("/", async (req, res) => {
+router.get("/search", async (req, res) => {
 	try {
-		const profiles = await Profile.find({
-			artistName: req.query.query.toString(),
-		}).populate("user", "name");
+		let result = await Profile.aggregate([
+			{
+				$search: {
+					autocomplete: {
+						query: `${req.query.query}`,
+						path: "artistName",
+						fuzzy: {
+							maxEdits: 2,
+							prefixLength: 3,
+						},
+					},
+				},
+			},
+		]);
+		// const profiles = await Profile.find({
+		// 	artistName: req.query.query.toString(),
+		// }).populate("user", "name");
 
-		if (profiles.length == 0) {
-			return res.status(400).json({ msg: "No user found" });
-		}
-		res.json(profiles);
+		// if (profiles.length == 0) {
+		// 	return res.status(400).json({ msg: "No user found" });
+		// }
+		res.send(result);
 	} catch (err) {
 		console.error(err.message);
 		res.status(500).send("Server error");
