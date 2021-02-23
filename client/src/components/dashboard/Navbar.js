@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { fade, makeStyles } from "@material-ui/core/styles";
+import { fade, makeStyles, withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -15,14 +15,25 @@ import MailIcon from "@material-ui/icons/Mail";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import { Avatar } from "@material-ui/core";
+import AddIcon from "@material-ui/icons/Add";
+import Modal from "@material-ui/core/Modal";
+import Dialog from "@material-ui/core/Dialog";
+
+import MuiDialogContent from "@material-ui/core/DialogContent";
 
 import TextField from "@material-ui/core/TextField";
 import Notification from "./notification/Notification";
 import Autocomplete from "./AutoComplete";
 import AutoComplete from "./AutoComplete";
 import img from "../../images/avatar.png";
+import PostInput from "../PostInput";
 
 const useStyles = makeStyles((theme) => ({
+	root: {
+		margin: 0,
+		padding: theme.spacing(2),
+	},
+
 	grow: {
 		flexGrow: 1,
 	},
@@ -68,6 +79,15 @@ const useStyles = makeStyles((theme) => ({
 			width: "20ch",
 		},
 	},
+
+	postInput: {
+		width: "70vw",
+		height: "15rem",
+
+		[theme.breakpoints.up("md")]: {
+			width: "30vw",
+		},
+	},
 	autoSuggestList: {
 		position: "absolute",
 		zIndex: "2",
@@ -92,6 +112,11 @@ const useStyles = makeStyles((theme) => ({
 		},
 	},
 }));
+const DialogContent = withStyles((theme) => ({
+	root: {
+		padding: theme.spacing(2),
+	},
+}))(MuiDialogContent);
 
 const Navbar = () => {
 	const classes = useStyles();
@@ -99,6 +124,14 @@ const Navbar = () => {
 	const [notifEl, setNotifEl] = React.useState(null);
 
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+	const [open, setOpen] = React.useState(false);
+
+	const handlePostOpen = () => {
+		setOpen(true);
+	};
+	const handleClose = () => {
+		setOpen(false);
+	};
 
 	const isMenuOpen = Boolean(anchorEl);
 	const isNotifOpen = Boolean(notifEl);
@@ -195,12 +228,23 @@ const Navbar = () => {
 				</IconButton>
 				<p>Rik</p>
 			</MenuItem>
+			<MenuItem onClick={handlePostOpen}>
+				<IconButton
+					aria-label='account of current user'
+					aria-controls='primary-search-account-menu'
+					aria-haspopup='true'
+					color='inherit'
+				>
+					<AddIcon />
+				</IconButton>
+				<p>Write a post</p>
+			</MenuItem>
 		</Menu>
 	);
 
 	return (
 		<div className={classes.grow}>
-			<AppBar position='static'>
+			<AppBar position='fixed'>
 				<Toolbar>
 					<IconButton
 						edge='start'
@@ -241,7 +285,7 @@ const Navbar = () => {
 							color='inherit'
 						>
 							<Typography variant='subtitle2'> Rik</Typography>
-							<Avatar style={{ margin: " 0 1rem" }} />
+							<Avatar src='./images/avatar.png' style={{ margin: " 0 1rem" }} />
 						</IconButton>
 						<IconButton
 							aria-controls='open-notification'
@@ -252,6 +296,14 @@ const Navbar = () => {
 							<Badge badgeContent={17} color='secondary'>
 								<NotificationsIcon />
 							</Badge>
+						</IconButton>
+						<IconButton
+							aria-controls=''
+							aria-label='show 17 new notifications'
+							color='inherit'
+							onClick={handlePostOpen}
+						>
+							<AddIcon />
 						</IconButton>
 					</div>
 					<div className={classes.sectionMobile}>
@@ -267,9 +319,23 @@ const Navbar = () => {
 					</div>
 				</Toolbar>
 			</AppBar>
+			<Toolbar />
 			{renderMobileMenu}
 			{renderMenu}
 			{renderNotif}
+			<Dialog
+				style={{}}
+				maxWidth='xl'
+				onClose={handleClose}
+				aria-labelledby='customized-dialog-title'
+				open={open}
+			>
+				<DialogContent className={classes.postInput} dividers>
+					<div style={{ padding: "" }}>
+						<PostInput />
+					</div>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 };
