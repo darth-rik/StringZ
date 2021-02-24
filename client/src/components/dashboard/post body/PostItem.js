@@ -52,12 +52,12 @@ const PostItem = () => {
 					style={{
 						display: "flex",
 						alignItems: "center",
-						gap: "1.5rem",
+
 						padding: "1.5rem",
 					}}
 				>
 					<img
-						style={{ height: "5rem", width: "5rem" }}
+						style={{ height: "5rem", width: "5rem", marginRight: "1.5rem" }}
 						src='./images/avatar.png'
 						alt=''
 					/>

@@ -1,5 +1,5 @@
 import React from "react";
-import Navbar from "../components/dashboard/Navbar";
+import Navbar from "../components/Navbar";
 import PostInput from "../components/PostInput";
 import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";

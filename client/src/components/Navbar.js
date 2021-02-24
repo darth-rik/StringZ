@@ -22,11 +22,11 @@ import Dialog from "@material-ui/core/Dialog";
 import MuiDialogContent from "@material-ui/core/DialogContent";
 
 import TextField from "@material-ui/core/TextField";
-import Notification from "./notification/Notification";
-import Autocomplete from "./AutoComplete";
-import AutoComplete from "./AutoComplete";
-import img from "../../images/avatar.png";
-import PostInput from "../PostInput";
+import Notification from "./dashboard/notification/Notification";
+import AutoComplete from "./dashboard/AutoComplete";
+
+import img from "../images/avatar.png";
+import PostInput from "./PostInput";
 
 const useStyles = makeStyles((theme) => ({
 	root: {

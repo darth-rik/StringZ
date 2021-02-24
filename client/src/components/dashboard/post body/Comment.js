@@ -11,7 +11,9 @@ const Comment = () => {
 					gap: "1.5rem",
 				}}
 			>
-				<Avatar style={{ width: "3rem", height: "3rem" }} />
+				<Avatar
+					style={{ width: "3rem", height: "3rem", marginRight: "1.5rem" }}
+				/>
 				<div>
 					<p>AntiClock Minds</p>
 					<p style={{ marginTop: "-.5rem", fontWeight: "lighter" }}>
