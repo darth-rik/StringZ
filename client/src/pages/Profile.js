@@ -161,22 +161,22 @@ const Profile = () => {
 										/>
 										<Typography varaint='caption'>Change Photo</Typography>
 									</div>
-									<div
+									{/* <div
 										style={{
 											display: "flex",
 											flexDirection: "column",
 											flexWrap: "wrap",
 										}}
-									>
-										<input
-											style={{ margin: ".5rem 0" }}
-											type='file'
-											id='img'
-											accept='image/*'
-											onChange={handlePic}
-										></input>
-										<input style={{ alignSelf: "start" }} type='submit'></input>
-									</div>
+									> */}
+									<input
+										style={{ margin: ".5rem 0", alignSelf: "center" }}
+										type='file'
+										id='img'
+										accept='image/*'
+										onChange={handlePic}
+									></input>
+									{/* <input style={{ alignSelf: "start" }} type='submit'></input> */}
+									{/* </div> */}
 								</form>
 								<form className={classes.root} noValidate autoComplete='off'>
 									<div>
@@ -272,7 +272,7 @@ const Profile = () => {
 			</Container>
 			{/* <Divider style={{ width: "70%", margin: "auto" }} /> */}
 
-			<Container maxWidth='md' style={{ textAlign: "" }}>
+			<Container maxWidth='md' style={{ textAlign: "center" }}>
 				{/* <Typography style={{ textAlign: "center" }} variant='h5'>
 					About
 				</Typography> */}

@@ -26,6 +26,7 @@ import Notification from "./dashboard/notification/Notification";
 import AutoComplete from "./dashboard/AutoComplete";
 
 import img from "../images/avatar.png";
+import LogoBlack from "../images/logo-black.png";
 import PostInput from "./PostInput";
 
 const useStyles = makeStyles((theme) => ({
@@ -252,7 +253,11 @@ const Navbar = () => {
 						color='inherit'
 						// aria-label='open drawer'
 					>
-						Z
+						<img
+							src={LogoBlack}
+							style={{ height: "2rem", width: "2rem" }}
+							alt=''
+						/>
 					</IconButton>
 
 					<div style={{ width: "100%" }}>
