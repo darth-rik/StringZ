@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { Avatar, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import LogoWhite from "../images/logo-white.png";
+import { Link, Redirect } from "react-router-dom";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import { login } from "../actions/auth";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -31,10 +35,34 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const SignIn = () => {
+const SignIn = ({ login, isAuthenticated }, props) => {
 	const classes = useStyles();
+	const [formData, setFormData] = useState({
+		email: "",
+		password: "",
+	});
+
+	const { email, password } = formData;
+
+	const onChange = (e) =>
+		setFormData({
+			...formData,
+			[e.target.name]: e.target.value,
+		});
+
+	const onSubmit = (e) => {
+		e.preventDefault();
+		login(email, password);
+	};
+
+	//Redirect if logged in
+	if (isAuthenticated) {
+		return <Redirect to='/dashboard' />;
+		// props.history.push("/dashboard");
+	}
+
 	return (
-		<div className={classes.root}>
+		<form className={classes.root} onSubmit={onSubmit}>
 			<img src={LogoWhite} style={{ height: "3rem", width: "3rem" }} alt='' />
 			<Typography variant='h5' style={{ fontWeight: "bolder" }}>
 				Log in to StringZ
@@ -43,20 +71,38 @@ const SignIn = () => {
 			<TextField
 				variant='outlined'
 				label='email'
+				name='email'
+				type='email'
+				onChange={(e) => onChange(e)}
 				className={classes.textInputs}
 			/>
 			<TextField
 				variant='outlined'
 				label='password'
+				name='password'
+				type='password'
+				onChange={(e) => onChange(e)}
 				className={classes.textInputs}
 			/>
 
-			<Button variant='contained' color='primary' size='large'>
+			<Button type='submit' variant='contained' color='primary' size='large'>
 				Log In
 			</Button>
-			<a href='/'>Back to Home</a>
-		</div>
+			<Link style={{ color: "black" }} to='/'>
+				{" "}
+				Back to home
+			</Link>
+		</form>
 	);
 };
 
-export default SignIn;
+SignIn.propTypes = {
+	login: PropTypes.func.isRequired,
+	isAuthenticated: PropTypes.bool,
+};
+
+const mapStateToProps = (state) => ({
+	isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps, { login })(SignIn);

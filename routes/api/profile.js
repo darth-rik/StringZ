@@ -9,6 +9,7 @@ const config = require("config");
 const jwt = require("jsonwebtoken");
 const User = require("../../models/User");
 const Profile = require("../../models/Profile");
+const Photo = require("../../models/Photo");
 
 //@route   GET api/profile/me
 //@desc    Get current users profile
@@ -16,7 +17,12 @@ const Profile = require("../../models/Profile");
 
 router.get("/me", auth, async (req, res) => {
 	try {
-		const profile = await Profile.findOne({ user: req.user.id });
+		const profile = await Profile.findOne({
+			user: req.user.id,
+		}).populate({
+			path: "avatar",
+			model: "Photo",
+		});
 
 		if (!profile) {
 			return res.status(400).json({ msg: "No profile found for user" });
@@ -34,11 +40,7 @@ router.get("/me", auth, async (req, res) => {
 
 router.post("/", [
 	auth,
-	images.uploadUserImage,
-	[
-		check("genre", "Genre is required").not().isEmpty(),
-		check("equipments", "Equipment/s required").not().isEmpty(),
-	],
+
 	async (req, res) => {
 		if (req.fileValidationError) {
 			return res.status(400).json({ msg: req.fileValidationError });
@@ -63,11 +65,21 @@ router.post("/", [
 			amazonMusic,
 			appleMusic,
 		} = req.body;
-
 		const profileFields = {};
 
 		profileFields.user = req.user.id;
-		if (req.file) profileFields.photo = req.file.filename;
+
+		let avatar = await Photo.findOne({ user: req.user.id });
+
+		if (avatar) {
+			profileFields.avatar = avatar.id;
+		} else {
+			avatar = new Photo({ user: req.user.id });
+
+			await avatar.save();
+
+			profileFields.avatar = avatar.id;
+		}
 
 		if (artistName) profileFields.artistName = artistName;
 		if (bio) profileFields.bio = bio;
@@ -111,7 +123,52 @@ router.post("/", [
 	},
 ]);
 
-//@route   GET api/profile
+//@route   POST api/profile/pic
+//@desc     Upload Photo of user
+//@access  Private
+router.post("/pic", [auth, images.uploadUserImage], async (req, res) => {
+	const photoFields = {};
+	// let profile = await Profile.findOne({ user: req.user.id });
+	photoFields.user = req.user.id;
+	photoFields.avatar = req.file.filename;
+	try {
+		let avatar = await Photo.findOne({ user: req.user.id });
+
+		//Update
+
+		avatar = await Photo.findOneAndUpdate(
+			{ user: req.user.id },
+			{ $set: photoFields },
+			{ new: true }
+		);
+		//Create
+		return res.json(avatar);
+
+		// avatar = new Photo(photoFields);
+		// await avatar.save();
+		// res.json(avatar);
+	} catch (err) {
+		res.status(500).send("Server error");
+	}
+});
+
+// router.get("/pic", auth, async (req, res) => {
+// 	try {
+// 		const photo = await Photo.findOne({
+// 			user: req.user.id,
+// 		});
+
+// 		if (!photo) {
+// 			return res.status(400).json({ msg: "No photo found for user" });
+// 		}
+
+// 		res.json(photo);
+// 	} catch (err) {
+// 		res.status(500).send("Server error");
+// 	}
+// });
+
+//@route   GET api/profile/search?query
 //@desc    Search profiles by name
 //@access  Private
 
@@ -125,20 +182,21 @@ router.get("/search", async (req, res) => {
 						path: "artistName",
 						fuzzy: {
 							maxEdits: 2,
-							prefixLength: 3,
+							prefixLength: 2,
 						},
 					},
 				},
 			},
 		]);
-		// const profiles = await Profile.find({
-		// 	artistName: req.query.query.toString(),
-		// }).populate("user", "name");
 
-		// if (profiles.length == 0) {
-		// 	return res.status(400).json({ msg: "No user found" });
-		// }
-		res.send(result);
+		Profile.populate(
+			result,
+			{ path: "avatar" },
+
+			(err, data) => {
+				return res.json(data);
+			}
+		);
 	} catch (err) {
 		console.error(err.message);
 		res.status(500).send("Server error");
@@ -152,7 +210,10 @@ router.get("/user/:user_id", async (req, res) => {
 	try {
 		const profile = await Profile.findOne({
 			user: req.params.user_id,
-		}).populate("user", "name");
+		}).populate({
+			path: "avatar",
+			model: "Photo",
+		});
 
 		if (!profile) return res.status(400).json({ msg: "No profile for user" });
 
@@ -162,6 +223,74 @@ router.get("/user/:user_id", async (req, res) => {
 		if (err.kind === "ObjectId") {
 			return res.status(400).json({ msg: "No profile for user" });
 		}
+		res.status(500).send("Server error");
+	}
+});
+
+//@route   PUT api/profile/:notification_id
+//@desc    Mark notification as read
+//@access  Private
+
+router.put("/like/:like_id", auth, async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+
+		if (!profile) {
+			return res.status(400).json({ msg: "No profile found for user" });
+		}
+
+		const notification = profile.notification.likeNotif.find(
+			(not) => not.id === req.params.like_id
+		);
+
+		if (!notification) {
+			return res.status(404).json({ msg: "Notification does not exist" });
+		}
+		//Check user
+
+		if (notification.recipient.toString() !== req.user.id) {
+			return res.status(401).json({ msg: "User not authorized" });
+		}
+
+		notification.read = true;
+
+		await profile.save();
+		res.json(profile);
+	} catch (err) {
+		res.status(500).send("Server error");
+	}
+});
+
+//@route   PUT api/profile/:comment_id
+//@desc    Mark notification as read
+//@access  Private
+
+router.put("/comment/:comment_id", auth, async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+
+		if (!profile) {
+			return res.status(400).json({ msg: "No profile found for user" });
+		}
+
+		const notification = profile.notification.commentNotif.find(
+			(not) => not.id === req.params.comment_id
+		);
+
+		if (!notification) {
+			return res.status(404).json({ msg: "Notification does not exist" });
+		}
+		//Check user
+
+		if (notification.recipient.toString() !== req.user.id) {
+			return res.status(401).json({ msg: "User not authorized" });
+		}
+
+		notification.read = true;
+
+		await profile.save();
+		res.json(profile);
+	} catch (err) {
 		res.status(500).send("Server error");
 	}
 });

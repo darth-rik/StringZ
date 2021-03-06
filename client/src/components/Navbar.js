@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { fade, makeStyles, withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -8,15 +8,15 @@ import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
-import MenuIcon from "@material-ui/icons/Menu";
+
 import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
-import MailIcon from "@material-ui/icons/Mail";
+
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import { Avatar } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-import Modal from "@material-ui/core/Modal";
+
 import Dialog from "@material-ui/core/Dialog";
 
 import MuiDialogContent from "@material-ui/core/DialogContent";
@@ -28,6 +28,14 @@ import AutoComplete from "./dashboard/AutoComplete";
 import img from "../images/avatar.png";
 import LogoBlack from "../images/logo-black.png";
 import PostInput from "./PostInput";
+
+import { connect } from "react-redux";
+import { logout } from "../actions/auth";
+import { searchProfile } from "../actions/profile";
+import { getCurrentProfile } from "../actions/profile";
+
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -87,6 +95,7 @@ const useStyles = makeStyles((theme) => ({
 
 		[theme.breakpoints.up("md")]: {
 			width: "30vw",
+			overflow: "hidden",
 		},
 	},
 	autoSuggestList: {
@@ -119,13 +128,24 @@ const DialogContent = withStyles((theme) => ({
 	},
 }))(MuiDialogContent);
 
-const Navbar = () => {
+const Navbar = ({
+	logout,
+	profile: { profiles, profile },
+	searchProfile,
+	getCurrentProfile,
+	auth,
+}) => {
+	useEffect(() => {
+		getCurrentProfile();
+	}, [getCurrentProfile]);
+
 	const classes = useStyles();
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [notifEl, setNotifEl] = React.useState(null);
 
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 	const [open, setOpen] = React.useState(false);
+	const [close, setClose] = React.useState(false);
 
 	const handlePostOpen = () => {
 		setOpen(true);
@@ -161,6 +181,26 @@ const Navbar = () => {
 		setMobileMoreAnchorEl(event.currentTarget);
 	};
 
+	const handleLogout = () => {
+		handleMenuClose();
+		logout();
+	};
+
+	const search = (e) => {
+		if (e.target.value === "") {
+			setClose(true);
+			return;
+		}
+
+		setClose(false);
+
+		searchProfile(e.target.value);
+	};
+
+	const closeList = () => {
+		setClose(true);
+	};
+
 	const menuId = "primary-search-account-menu";
 	const renderMenu = (
 		<Menu
@@ -172,8 +212,11 @@ const Navbar = () => {
 			open={isMenuOpen}
 			onClose={handleMenuClose}
 		>
-			<MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-			<MenuItem onClick={handleMenuClose}>My account</MenuItem>
+			<Link style={{ color: "black" }} to={`/profile`}>
+				{" "}
+				<MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+			</Link>
+			<MenuItem onClick={handleLogout}>Logout</MenuItem>
 		</Menu>
 	);
 
@@ -212,7 +255,14 @@ const Navbar = () => {
 					color='inherit'
 					aria-haspopup='true'
 				>
-					<Badge badgeContent={11} color='secondary'>
+					<Badge
+						badgeContent={
+							profile &&
+							profile.notification.likeNotif.length +
+								profile.notification.commentNotif.length
+						}
+						color='secondary'
+					>
 						<NotificationsIcon />
 					</Badge>
 				</IconButton>
@@ -227,7 +277,7 @@ const Navbar = () => {
 				>
 					<AccountCircle />
 				</IconButton>
-				<p>Rik</p>
+				<p>{profile ? profile.artistName : "User1234"}</p>
 			</MenuItem>
 			<MenuItem onClick={handlePostOpen}>
 				<IconButton
@@ -243,22 +293,24 @@ const Navbar = () => {
 		</Menu>
 	);
 
-	return (
+	return profile ? (
 		<div className={classes.grow}>
 			<AppBar position='fixed'>
 				<Toolbar>
-					<IconButton
-						edge='start'
-						className={classes.menuButton}
-						color='inherit'
-						// aria-label='open drawer'
-					>
-						<img
-							src={LogoBlack}
-							style={{ height: "2rem", width: "2rem" }}
-							alt=''
-						/>
-					</IconButton>
+					<Link to='/dashboard'>
+						<IconButton
+							edge='start'
+							className={classes.menuButton}
+							color='inherit'
+							// aria-label='open drawer'
+						>
+							<img
+								src={LogoBlack}
+								style={{ height: "2rem", width: "2rem" }}
+								alt=''
+							/>
+						</IconButton>
+					</Link>
 
 					<div style={{ width: "100%" }}>
 						<div className={classes.search}>
@@ -266,6 +318,7 @@ const Navbar = () => {
 								<SearchIcon />
 							</div>
 							<InputBase
+								onKeyUp={search}
 								style={{ width: "100%" }}
 								placeholder='Search for artists/bands…'
 								classes={{
@@ -274,9 +327,21 @@ const Navbar = () => {
 								}}
 								inputProps={{ "aria-label": "search" }}
 							/>
-							<div className={classes.autoSuggestList}>
-								{/* <AutoComplete /> */}
-							</div>
+							{profiles.length > 0 && (
+								<div
+									onClick={closeList}
+									style={{ display: close ? "none" : "block" }}
+									className={classes.autoSuggestList}
+								>
+									{profiles.map((data) => (
+										<AutoComplete
+											key={data._id}
+											data={data}
+											close={closeList}
+										/>
+									))}
+								</div>
+							)}
 						</div>
 					</div>
 					<div className={classes.grow} />
@@ -289,8 +354,16 @@ const Navbar = () => {
 							onClick={handleProfileMenuOpen}
 							color='inherit'
 						>
-							<Typography variant='subtitle2'> Rik</Typography>
-							<Avatar src='./images/avatar.png' style={{ margin: " 0 1rem" }} />
+							<Typography variant='subtitle2'>
+								{profile ? profile.artistName : "User1234"}
+							</Typography>
+							<Avatar
+								src={
+									profile.avatar.avatar && `/images/${profile.avatar.avatar}`
+								}
+								style={{ margin: " 0 1rem" }}
+								alt=''
+							/>
 						</IconButton>
 						<IconButton
 							aria-controls='open-notification'
@@ -298,7 +371,14 @@ const Navbar = () => {
 							color='inherit'
 							onClick={handleNotificationOpen}
 						>
-							<Badge badgeContent={17} color='secondary'>
+							<Badge
+								badgeContent={
+									profile &&
+									profile.notification.likeNotif.length +
+										profile.notification.commentNotif.length
+								}
+								color='secondary'
+							>
 								<NotificationsIcon />
 							</Badge>
 						</IconButton>
@@ -329,20 +409,33 @@ const Navbar = () => {
 			{renderMenu}
 			{renderNotif}
 			<Dialog
-				style={{}}
 				maxWidth='xl'
 				onClose={handleClose}
 				aria-labelledby='customized-dialog-title'
 				open={open}
 			>
 				<DialogContent className={classes.postInput} dividers>
-					<div style={{ padding: "" }}>
+					<div>
 						<PostInput />
 					</div>
 				</DialogContent>
 			</Dialog>
 		</div>
-	);
+	) : null;
 };
 
-export default Navbar;
+Navbar.propTypes = {
+	logout: PropTypes.func.isRequired,
+	searchProfile: PropTypes.func.isRequired,
+	getCurrentProfile: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+	profile: state.profile,
+});
+
+export default connect(mapStateToProps, {
+	logout,
+	searchProfile,
+	getCurrentProfile,
+})(Navbar);

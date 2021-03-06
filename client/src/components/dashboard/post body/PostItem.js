@@ -13,6 +13,11 @@ import MessageIcon from "@material-ui/icons/Message";
 import DeleteMenu from "./DeleteMenu";
 import Comment from "./Comment";
 
+import Moment from "react-moment";
+import { connect } from "react-redux";
+import { addLike, removeLike } from "../../../actions/post";
+import PropTypes from "prop-types";
+
 const useStyles = makeStyles((theme) => ({
 	postComponent: {
 		backgroundColor: "",
@@ -28,7 +33,12 @@ const useStyles = makeStyles((theme) => ({
 		},
 	},
 }));
-const PostItem = () => {
+const PostItem = ({
+	auth,
+	post: { _id, text, name, avatar, user, likes, comments, date },
+	addLike,
+	removeLike,
+}) => {
 	const classes = useStyles();
 	const commentPanel = useRef();
 	const [comment, setComment] = useState(false);
@@ -38,14 +48,22 @@ const PostItem = () => {
 		comment ? setComment(false) : setComment(true);
 	};
 	const toggleLikes = () => {
-		like ? setLike(false) : setLike(true);
+		if (like) {
+			setLike(false);
+			removeLike(_id);
+		} else {
+			setLike(true);
+			addLike(_id);
+		}
 	};
 
 	return (
 		<div className={classes.postComponent}>
-			<div style={{ position: "absolute", right: ".5rem", top: "" }}>
-				<DeleteMenu />
-			</div>
+			{!auth.loading && user === auth.user._id && (
+				<div style={{ position: "absolute", right: ".5rem", top: "" }}>
+					<DeleteMenu />
+				</div>
+			)}
 
 			<div>
 				<div
@@ -56,15 +74,15 @@ const PostItem = () => {
 						padding: "1.5rem",
 					}}
 				>
-					<img
+					<Avatar
 						style={{ height: "5rem", width: "5rem", marginRight: "1.5rem" }}
-						src='./images/avatar.png'
+						src={`./images/${avatar}`}
 						alt=''
 					/>
 					<div>
-						<p style={{ fontWeight: "bold" }}>AntiClock Minds</p>
+						<p style={{ fontWeight: "bold" }}>{name}</p>
 						<p style={{ fontWeight: "lighter", marginTop: "-.5rem" }}>
-							2 hours ago
+							<Moment format='YYYY/MM/DD'>{date}</Moment>
 						</p>
 					</div>
 				</div>
@@ -78,9 +96,7 @@ const PostItem = () => {
 					}}
 					variant='subtitle1'
 				>
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint,
-					sapiente, odio totam minima, cum nobis maxime voluptate placeat a odit
-					eaque? Lorem,
+					{text}
 				</Typography>
 
 				<Divider style={{ width: "50%", margin: "auto", padding: "" }} />
@@ -107,7 +123,7 @@ const PostItem = () => {
 							}}
 							onClick={toggleLikes}
 						/>
-						Like (3)
+						Like ({likes.length})
 					</li>
 					<li
 						style={{
@@ -122,7 +138,7 @@ const PostItem = () => {
 							}}
 							onClick={toggleComments}
 						/>
-						Discussion (4)
+						Discussion ({comments.length})
 					</li>
 				</ul>
 			</div>
@@ -169,4 +185,13 @@ const PostItem = () => {
 	);
 };
 
-export default PostItem;
+PostItem.propTypes = {
+	post: PropTypes.object.isRequired,
+	auth: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+	auth: state.auth,
+});
+
+export default connect(mapStateToProps, { addLike, removeLike })(PostItem);

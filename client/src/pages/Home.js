@@ -1,4 +1,7 @@
 import React from "react";
+import { Link, Redirect } from "react-router-dom";
+
+import { connect } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
 import Image from "../images/background.png";
 import { Button, Container, Typography } from "@material-ui/core";
@@ -47,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const Home = () => {
+const Home = ({ isAuthenticated }) => {
 	const classes = useStyles();
 	const [state, setState] = React.useState({
 		left: false,
@@ -85,14 +88,25 @@ const Home = () => {
 
 			<Divider />
 			<List style={{ marginTop: "2rem" }}>
-				{["Register", "Login"].map((text, index) => (
-					<ListItem button key={text}>
-						<ListItemText primary={text} />
+				<Link to='/register' style={{ color: "black" }}>
+					<ListItem button>
+						<ListItemText primary='Register' />
 					</ListItem>
-				))}
+				</Link>
+
+				<Link to='/login' style={{ color: "black" }}>
+					<ListItem button>
+						<ListItemText primary='Login' />
+					</ListItem>
+				</Link>
 			</List>
 		</div>
 	);
+
+	if (isAuthenticated) {
+		return <Redirect to='/dashboard' />;
+		// props.history.push("/dashboard");
+	}
 	return (
 		<div className={classes.root}>
 			<Container
@@ -120,8 +134,22 @@ const Home = () => {
 						fontSize: "1.2rem",
 					}}
 				>
-					<li style={{ marginRight: "4rem", cursor: "pointer" }}> Register</li>
-					<li style={{ marginRight: "4rem", cursor: "pointer" }}>Login</li>
+					<Link to='/register'>
+						{" "}
+						<li
+							style={{
+								marginRight: "4rem",
+								cursor: "pointer",
+							}}
+						>
+							{" "}
+							Register
+						</li>
+					</Link>
+					<Link to='/login'>
+						{" "}
+						<li style={{ marginRight: "4rem", cursor: "pointer" }}>Login</li>
+					</Link>
 				</ul>
 
 				{/** Hamburger Menu on mobile view*/}
@@ -176,21 +204,28 @@ const Home = () => {
 				>
 					Create your profile and connect with musicians from around the world
 				</Typography>
-
-				<Button
-					variant='contained'
-					color='secondary'
-					style={{ marginRight: "1.5rem" }}
-					size='large'
-				>
-					SignUp
-				</Button>
-				<Button variant='contained' size='large'>
-					Login
-				</Button>
+				<Link to='/register'>
+					<Button
+						variant='contained'
+						color='secondary'
+						style={{ marginRight: "1.5rem" }}
+						size='large'
+					>
+						SignUp
+					</Button>
+				</Link>
+				<Link to='/login'>
+					<Button variant='contained' size='large'>
+						Login
+					</Button>
+				</Link>
 			</Container>
 		</div>
 	);
 };
 
-export default Home;
+const mapStateToProps = (state) => ({
+	isAuthenticated: state.auth.isAuthenticated,
+});
+
+export default connect(mapStateToProps)(Home);

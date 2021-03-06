@@ -14,18 +14,17 @@ const ProfileSchema = mongoose.Schema({
 		type: String,
 	},
 
-	photo: {
-		type: String,
+	avatar: {
+		type: mongoose.Schema.Types.String,
+		ref: "Photo",
 	},
 
 	genre: {
 		type: String,
-		required: true,
 	},
 
 	equipments: {
 		type: [String],
-		required: true,
 	},
 
 	social: {
@@ -65,12 +64,12 @@ const ProfileSchema = mongoose.Schema({
 					type: Boolean,
 				},
 
-				post: {
+				creator: {
 					type: mongoose.Schema.Types.ObjectId,
-					ref: "Post",
+					ref: "User",
 				},
 
-				userId: {
+				recipient: {
 					type: mongoose.Schema.Types.ObjectId,
 					ref: "User",
 				},
@@ -94,14 +93,19 @@ const ProfileSchema = mongoose.Schema({
 					type: Boolean,
 				},
 
-				post: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "Post",
-				},
-
-				userId: {
+				creator: {
 					type: mongoose.Schema.Types.ObjectId,
 					ref: "User",
+				},
+
+				recipient: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "User",
+				},
+
+				commentId: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "Post",
 				},
 
 				name: {

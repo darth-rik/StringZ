@@ -21,12 +21,15 @@ router.post(
 		}
 
 		try {
-			const user = await Profile.findOne({ user: req.user.id });
+			const user = await Profile.findOne({ user: req.user.id }).populate({
+				path: "avatar",
+				model: "Photo",
+			});
 
 			const newPost = new Post({
 				text: req.body.text,
 				name: user.artistName,
-				avatar: user.photo,
+				avatar: user.avatar.avatar,
 				user: req.user.id,
 			});
 
@@ -128,19 +131,24 @@ router.put("/like/:id", auth, async (req, res) => {
 
 		const recipient = await Profile.findOne({ user: post.user });
 
-		const currentUser = await Profile.findOne({ user: req.user.id });
+		const currentUser = await Profile.findOne({ user: req.user.id }).populate({
+			path: "avatar",
+			model: "Photo",
+		});
 
 		//Check if like is made by the current user
 		if (recipient.user.toString() !== req.user.id) {
 			const likeNotif = {
 				read: false,
 
-				userId: req.user.id,
+				creator: req.user.id,
+
+				recipient: recipient.user,
 
 				post: req.params.id,
 
 				name: currentUser.artistName,
-				avatar: currentUser.photo,
+				avatar: currentUser.avatar.avatar,
 			};
 
 			recipient.notification.likeNotif.unshift(likeNotif);
@@ -179,7 +187,15 @@ router.put("/unlike/:id", auth, async (req, res) => {
 		post.likes.splice(removeIndex, 1);
 
 		await post.save();
-
+		// Delete like notification
+		const recipient = await Profile.findOne({ user: post.user });
+		if (recipient.user.toString() !== req.user.id) {
+			const removeIndex = recipient.notification.likeNotif
+				.map((like) => like.creator.toString())
+				.indexOf(req.user.id);
+			recipient.notification.likeNotif.splice(removeIndex, 1);
+			await recipient.save();
+		}
 		res.json(post.likes);
 	} catch (err) {
 		console.error(err.message);
@@ -202,7 +218,10 @@ router.post(
 		}
 
 		try {
-			const user = await Profile.findOne({ user: req.user.id });
+			const user = await Profile.findOne({ user: req.user.id }).populate({
+				path: "avatar",
+				model: "Photo",
+			});
 			const post = await Post.findById(req.params.id);
 
 			const newComment = {
@@ -219,17 +238,23 @@ router.post(
 
 			const recipient = await Profile.findOne({ user: post.user });
 
+			const comment = post.comments[0];
+
 			//Check if comment is made by the current user
 			if (recipient.user.toString() !== req.user.id) {
 				const commentNotif = {
 					read: false,
 
-					userId: req.user.id,
+					creator: req.user.id,
+
+					recipient: recipient.user,
+
+					commentId: comment._id,
 
 					post: req.params.id,
 
 					name: user.artistName,
-					avatar: user.photo,
+					avatar: user.avatar.avatar,
 				};
 
 				recipient.notification.commentNotif.unshift(commentNotif);
@@ -271,11 +296,21 @@ router.delete("/comment/:id/:comment_id", auth, async (req, res) => {
 			return res.status(401).json({ msg: "User not authorized" });
 		}
 
-		const removeIndex = post.comments
-			.map((comment) => comment.user.toString())
-			.indexOf(req.user.id);
+		const recipient = await Profile.findOne({ user: post.user });
 
-		post.comments.splice(removeIndex, 1);
+		if (recipient.user.toString() !== req.user.id) {
+			const index = recipient.notification.commentNotif
+				.map((el) => el.commentId.toString())
+				.indexOf(req.params.comment_id);
+
+			recipient.notification.commentNotif.splice(index, 1);
+
+			await recipient.save();
+		}
+
+		post.comments = post.comments.filter(
+			({ id }) => id !== req.params.comment_id
+		);
 
 		await post.save();
 
