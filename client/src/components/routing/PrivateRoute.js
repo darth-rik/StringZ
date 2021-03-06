@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import Spinner from "../layouts/Spinner";
 import Navbar from "../Navbar";
+import Alerts from "../layouts/Alerts";
 
 const PrivateRoute = ({
 	component: Component,
@@ -18,6 +19,7 @@ const PrivateRoute = ({
 			) : isAuthenticated ? (
 				<>
 					<Navbar />
+					<Alerts />
 					<Component {...props} />
 				</>
 			) : (

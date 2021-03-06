@@ -3,10 +3,13 @@ import IconButton from "@material-ui/core/IconButton";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
+import { connect } from "react-redux";
+import { deletePost } from "../../../actions/post";
+import PropTypes from "prop-types";
 
 const ITEM_HEIGHT = 48;
 
-const DeleteMenu = () => {
+const DeleteMenu = ({ id, deletePost }) => {
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const open = Boolean(anchorEl);
 
@@ -16,6 +19,7 @@ const DeleteMenu = () => {
 
 	const handleClose = () => {
 		setAnchorEl(null);
+		deletePost(id);
 	};
 
 	return (
@@ -47,4 +51,9 @@ const DeleteMenu = () => {
 	);
 };
 
-export default DeleteMenu;
+DeleteMenu.propTypes = {
+	id: PropTypes.string,
+	deletePost: PropTypes.func.isRequired,
+};
+
+export default connect(null, { deletePost })(DeleteMenu);

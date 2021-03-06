@@ -9,6 +9,7 @@ import {
 	Typography,
 } from "@material-ui/core/";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
+import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
 import MessageIcon from "@material-ui/icons/Message";
 import DeleteMenu from "./DeleteMenu";
 import Comment from "./Comment";
@@ -47,21 +48,21 @@ const PostItem = ({
 	const toggleComments = () => {
 		comment ? setComment(false) : setComment(true);
 	};
-	const toggleLikes = () => {
-		if (like) {
-			setLike(false);
-			removeLike(_id);
-		} else {
-			setLike(true);
-			addLike(_id);
-		}
+	const addLikes = () => {
+		setLike(true);
+		addLike(_id);
+	};
+	const removeLikes = () => {
+		removeLike(_id);
+
+		setLike(false);
 	};
 
 	return (
 		<div className={classes.postComponent}>
 			{!auth.loading && user === auth.user._id && (
 				<div style={{ position: "absolute", right: ".5rem", top: "" }}>
-					<DeleteMenu />
+					<DeleteMenu id={_id} />
 				</div>
 			)}
 
@@ -117,13 +118,19 @@ const PostItem = ({
 					>
 						<ThumbUpAltIcon
 							style={{
+								marginRight: ".1rem",
+								cursor: "pointer",
+							}}
+							onClick={addLikes}
+						/>
+						({likes.length}){" "}
+						<ThumbDownAltIcon
+							style={{
 								marginRight: ".5rem",
 								cursor: "pointer",
-								fill: like ? "red" : "black",
 							}}
-							onClick={toggleLikes}
+							onClick={removeLikes}
 						/>
-						Like ({likes.length})
 					</li>
 					<li
 						style={{
@@ -188,6 +195,8 @@ const PostItem = ({
 PostItem.propTypes = {
 	post: PropTypes.object.isRequired,
 	auth: PropTypes.object.isRequired,
+	addLike: PropTypes.func.isRequired,
+	removeLike: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
