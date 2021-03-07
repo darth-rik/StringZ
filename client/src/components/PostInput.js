@@ -4,6 +4,9 @@ import TextField from "@material-ui/core/TextField";
 import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import Divider from "@material-ui/core/Divider";
+import { connect } from "react-redux";
+import { addPost } from "../actions/post";
+import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -29,24 +32,36 @@ const useStyles = makeStyles((theme) => ({
 	},
 }));
 
-const PostInput = () => {
+const PostInput = ({ addPost, closePost }) => {
 	const classes = useStyles();
-	const [value, setValue] = React.useState("");
+	const [text, setText] = React.useState("");
 
 	const handleChange = (event) => {
-		setValue(event.target.value);
+		setText(event.target.value);
+	};
+
+	const onSubmit = (e) => {
+		e.preventDefault();
+
+		addPost({ text });
+		setText("");
+		closePost();
 	};
 
 	return (
 		<Fragment>
-			<form className={classes.root} noValidate autoComplete='off'>
+			<form
+				className={classes.root}
+				onSubmit={onSubmit}
+				noValidate
+				autoComplete='off'
+			>
 				<div style={{ padding: "1rem", height: "" }}>
 					<TextField
-						id='outlined-multiline-flexible'
 						label='Write Something..'
 						multiline
-						rowsMax={5}
-						value={value}
+						rowsMax={8}
+						value={text}
 						onChange={handleChange}
 						variant='outlined'
 						InputProps={{
@@ -59,6 +74,7 @@ const PostInput = () => {
 					style={{ alignSelf: "center", marginBottom: "1rem" }}
 					variant='contained'
 					color='primary'
+					type='submit'
 				>
 					Post
 				</Button>
@@ -67,4 +83,9 @@ const PostInput = () => {
 	);
 };
 
-export default PostInput;
+PostInput.propTypes = {
+	addPost: PropTypes.func.isRequired,
+	closePost: PropTypes.func.isRequired,
+};
+
+export default connect(null, { addPost })(PostInput);

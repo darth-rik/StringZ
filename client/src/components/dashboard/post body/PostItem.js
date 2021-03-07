@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
 	Divider,
@@ -16,7 +16,7 @@ import Comment from "./Comment";
 
 import Moment from "react-moment";
 import { connect } from "react-redux";
-import { addLike, removeLike } from "../../../actions/post";
+import { addLike, removeLike, addComment } from "../../../actions/post";
 import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
@@ -39,11 +39,16 @@ const PostItem = ({
 	post: { _id, text, name, avatar, user, likes, comments, date },
 	addLike,
 	removeLike,
+	addComment,
 }) => {
+	// useEffect(() => {
+	// 	getPost(_id);
+	// });
 	const classes = useStyles();
 	const commentPanel = useRef();
 	const [comment, setComment] = useState(false);
 	const [like, setLike] = useState(false);
+	const [value, setValue] = useState("");
 
 	const toggleComments = () => {
 		comment ? setComment(false) : setComment(true);
@@ -56,6 +61,16 @@ const PostItem = ({
 		removeLike(_id);
 
 		setLike(false);
+	};
+
+	const onChange = (e) => {
+		setValue(e.target.value);
+	};
+
+	const onSubmit = (e) => {
+		e.preventDefault();
+		addComment(_id, { text: value });
+		setValue("");
 	};
 
 	return (
@@ -161,31 +176,35 @@ const PostItem = ({
 			>
 				<Divider />
 
-				<Comment />
-
-				<Comment />
+				{comments.map((comment) => (
+					<Comment key={comment._id} comment={comment} postId={_id} />
+				))}
 			</Container>
 			<Container style={{ margin: "1rem 0", backgroundColor: "", height: "" }}>
 				<div style={{ display: "flex" }}>
 					<Avatar
 						style={{ height: "4rem", width: "4rem", marginRight: "2rem" }}
 					/>
-					<div
+					<form
 						style={{ display: "flex", flexDirection: "column", width: "80%" }}
+						onSubmit={onSubmit}
 					>
 						<TextField
 							variant='outlined'
 							multiline
 							placeholder='Add your thoughts..'
+							value={value}
+							onChange={onChange}
 						></TextField>
 						<Button
 							variant='contained'
 							color='primary'
 							style={{ marginTop: "1rem", alignSelf: "flex-end" }}
+							type='submit'
 						>
 							Post
 						</Button>
-					</div>
+					</form>
 				</div>
 			</Container>
 		</div>
@@ -197,10 +216,13 @@ PostItem.propTypes = {
 	auth: PropTypes.object.isRequired,
 	addLike: PropTypes.func.isRequired,
 	removeLike: PropTypes.func.isRequired,
+	addComment: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 	auth: state.auth,
 });
 
-export default connect(mapStateToProps, { addLike, removeLike })(PostItem);
+export default connect(mapStateToProps, { addLike, removeLike, addComment })(
+	PostItem
+);

@@ -416,7 +416,7 @@ const Navbar = ({
 			>
 				<DialogContent className={classes.postInput} dividers>
 					<div>
-						<PostInput />
+						<PostInput closePost={handleClose} />
 					</div>
 				</DialogContent>
 			</Dialog>
