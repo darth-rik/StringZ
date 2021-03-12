@@ -22,7 +22,11 @@ export default function (state = initialState, action) {
 			return {
 				...state,
 
-				profile: payload,
+				profile: {
+					...payload,
+					notification: payload.notification.filter((not) => not.read !== true),
+				},
+
 				loading: false,
 			};
 		case USER_PROFILE:

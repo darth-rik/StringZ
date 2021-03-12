@@ -170,6 +170,9 @@ const Profile = ({
 
 	const submitPhoto = (e) => {
 		e.preventDefault();
+		if (!photo) {
+			return;
+		}
 		createAvatar(photo);
 		setOpenPhoto(false);
 	};
@@ -488,7 +491,7 @@ const Profile = ({
 			</Container>
 			{/* <Divider style={{ width: "70%", margin: "auto" }} /> */}
 
-			<Container maxWidth='md' style={{ textAlign: "center", maxWidth: "50%" }}>
+			<Container maxWidth='md' style={{ textAlign: "center", maxWidth: "90%" }}>
 				{/* <Typography style={{ textAlign: "center" }} variant='h5'>
 					About
 				</Typography> */}

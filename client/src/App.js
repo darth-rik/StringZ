@@ -15,7 +15,7 @@ import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import SignIn from "./pages/SignIn";
 import Home from "./pages/Home";
-import Info from "./pages/Info";
+import UserPost from "./pages/UserPost";
 import Alerts from "./components/layouts/Alerts";
 import React, { Fragment, useEffect } from "react";
 
@@ -51,16 +51,14 @@ const App = () => {
 		<Provider store={store}>
 			<Router>
 				<ThemeProvider theme={theme}>
-					<Alerts />
-
 					<Route exact path='/register' component={Register} />
 					<Route exact path='/login' component={SignIn} />
 					<Route exact path='/' component={Home} />
 					<Switch>
 						<PrivateRoute exact path='/profile' component={Profile} />
 						<PrivateRoute exact path='/dashboard' component={Dashboard} />
-
 						<PrivateRoute exact path='/profile/:id' component={UserProfile} />
+						<PrivateRoute exact path='/post/:id' component={UserPost} />
 					</Switch>
 				</ThemeProvider>
 			</Router>

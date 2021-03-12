@@ -67,7 +67,6 @@ const SignIn = ({ login, isAuthenticated }, props) => {
 			<Typography variant='h5' style={{ fontWeight: "bolder" }}>
 				Log in to StringZ
 			</Typography>
-
 			<TextField
 				variant='outlined'
 				label='email'
@@ -84,14 +83,26 @@ const SignIn = ({ login, isAuthenticated }, props) => {
 				onChange={(e) => onChange(e)}
 				className={classes.textInputs}
 			/>
-
 			<Button type='submit' variant='contained' color='primary' size='large'>
 				Log In
-			</Button>
-			<Link style={{ color: "black" }} to='/'>
-				{" "}
-				Back to home
-			</Link>
+			</Button>{" "}
+			<Typography variant='subtitle2'>
+				Do not have an account? Click here to
+				<Link to='/register'>
+					{" "}
+					<strong>
+						<u>Register</u>
+					</strong>{" "}
+				</Link>
+			</Typography>
+			<Typography variant='subtitle2'>
+				Back to{" "}
+				<Link to='/'>
+					<strong>
+						<u>Home</u>
+					</strong>
+				</Link>
+			</Typography>
 		</form>
 	);
 };

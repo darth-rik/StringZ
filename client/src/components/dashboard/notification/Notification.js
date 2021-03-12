@@ -1,10 +1,21 @@
 import React from "react";
 import Typography from "@material-ui/core/Typography";
 import NotificationItems from "./NotificationItems";
+import MenuItem from "@material-ui/core/MenuItem";
+import { Divider } from "@material-ui/core";
 
-const Notification = () => {
+const Notification = ({ profiles: { notification }, close }) => {
+	const closeNotif = () => {
+		close();
+	};
 	return (
-		<div style={{ width: "100%", maxHeight: "70vh", overflowY: "scroll" }}>
+		<div
+			style={{
+				width: "100%",
+				maxHeight: "70vh",
+				overflowY: "scroll",
+			}}
+		>
 			<div
 				style={{
 					display: "grid",
@@ -22,9 +33,26 @@ const Notification = () => {
 				>
 					Notifications
 				</Typography>
-				<Typography>Mark all as read</Typography>
 			</div>
-			<NotificationItems />
+			<Divider />
+			<div>
+				{notification.length > 0 ? (
+					notification.map((not) => (
+						<NotificationItems
+							close={closeNotif}
+							key={not._id}
+							notification={not}
+						/>
+					))
+				) : (
+					<Typography
+						variant='subtitle1'
+						style={{ padding: "1rem 2rem", textAlign: "center" }}
+					>
+						No new notification
+					</Typography>
+				)}
+			</div>
 		</div>
 	);
 };

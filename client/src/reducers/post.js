@@ -49,6 +49,10 @@ export default function (state = initialState, action) {
 						? { ...post, comments: payload.comments }
 						: post
 				),
+				post: state.post && {
+					...state.post,
+					comments: payload.comments,
+				},
 				loading: false,
 			};
 
@@ -65,6 +69,12 @@ export default function (state = initialState, action) {
 						  }
 						: post
 				),
+				post: state.post && {
+					...state.post,
+					comments: state.post.comments.filter(
+						(comment) => comment._id !== payload.commentId
+					),
+				},
 				loading: false,
 			};
 
@@ -81,6 +91,10 @@ export default function (state = initialState, action) {
 					post._id === payload.postId ? { ...post, likes: payload.likes } : post
 				),
 				loading: false,
+				post:
+					state.post && state.post._id === payload.postId
+						? { ...state.post, likes: payload.likes }
+						: state.post,
 			};
 
 		case DELETE_POST:
@@ -88,6 +102,7 @@ export default function (state = initialState, action) {
 				...state,
 				posts: state.posts.filter((post) => post._id !== payload),
 				loading: false,
+				post: null,
 			};
 
 		default:

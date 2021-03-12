@@ -46,11 +46,6 @@ router.post("/", [
 			return res.status(400).json({ msg: req.fileValidationError });
 		} // Check if image uploaded is valid or not
 
-		const errors = validationResult(req);
-		if (!errors.isEmpty()) {
-			return res.status(400).json({ error: errors.array() });
-		}
-
 		const {
 			artistName,
 			bio,
@@ -126,31 +121,43 @@ router.post("/", [
 //@route   POST api/profile/pic
 //@desc     Upload Photo of user
 //@access  Private
-router.post("/pic", [auth, images.uploadUserImage], async (req, res) => {
-	const photoFields = {};
-	// let profile = await Profile.findOne({ user: req.user.id });
-	photoFields.user = req.user.id;
-	photoFields.avatar = req.file.filename;
-	try {
-		let avatar = await Photo.findOne({ user: req.user.id });
+router.post(
+	"/pic",
+	[
+		auth,
+		[check("avatar", "Picture is required").not().isEmpty()],
+		images.uploadUserImage,
+	],
+	async (req, res) => {
+		const photoFields = {};
+		// let profile = await Profile.findOne({ user: req.user.id });
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).json({ error: errors.array() });
+		}
+		photoFields.user = req.user.id;
+		photoFields.avatar = req.file.filename;
+		try {
+			let avatar = await Photo.findOne({ user: req.user.id });
 
-		//Update
+			//Update
 
-		avatar = await Photo.findOneAndUpdate(
-			{ user: req.user.id },
-			{ $set: photoFields },
-			{ new: true }
-		);
-		//Create
-		return res.json(avatar);
+			avatar = await Photo.findOneAndUpdate(
+				{ user: req.user.id },
+				{ $set: photoFields },
+				{ new: true }
+			);
+			//Create
+			return res.json(avatar);
 
-		// avatar = new Photo(photoFields);
-		// await avatar.save();
-		// res.json(avatar);
-	} catch (err) {
-		res.status(500).send("Server error");
+			// avatar = new Photo(photoFields);
+			// await avatar.save();
+			// res.json(avatar);
+		} catch (err) {
+			res.status(500).send("Server error");
+		}
 	}
-});
+);
 
 // router.get("/pic", auth, async (req, res) => {
 // 	try {
@@ -231,7 +238,7 @@ router.get("/user/:user_id", async (req, res) => {
 //@desc    Mark notification as read
 //@access  Private
 
-router.put("/like/:like_id", auth, async (req, res) => {
+router.put("/notification/:id", auth, async (req, res) => {
 	try {
 		const profile = await Profile.findOne({ user: req.user.id });
 
@@ -239,8 +246,8 @@ router.put("/like/:like_id", auth, async (req, res) => {
 			return res.status(400).json({ msg: "No profile found for user" });
 		}
 
-		const notification = profile.notification.likeNotif.find(
-			(not) => not.id === req.params.like_id
+		const notification = profile.notification.find(
+			(not) => not.id === req.params.id
 		);
 
 		if (!notification) {
@@ -261,38 +268,38 @@ router.put("/like/:like_id", auth, async (req, res) => {
 	}
 });
 
-//@route   PUT api/profile/:comment_id
-//@desc    Mark notification as read
-//@access  Private
+// //@route   PUT api/profile/:comment_id
+// //@desc    Mark notification as read
+// //@access  Private
 
-router.put("/comment/:comment_id", auth, async (req, res) => {
-	try {
-		const profile = await Profile.findOne({ user: req.user.id });
+// router.put("/comment/:comment_id", auth, async (req, res) => {
+// 	try {
+// 		const profile = await Profile.findOne({ user: req.user.id });
 
-		if (!profile) {
-			return res.status(400).json({ msg: "No profile found for user" });
-		}
+// 		if (!profile) {
+// 			return res.status(400).json({ msg: "No profile found for user" });
+// 		}
 
-		const notification = profile.notification.commentNotif.find(
-			(not) => not.id === req.params.comment_id
-		);
+// 		const notification = profile.notification.commentNotif.find(
+// 			(not) => not.id === req.params.comment_id
+// 		);
 
-		if (!notification) {
-			return res.status(404).json({ msg: "Notification does not exist" });
-		}
-		//Check user
+// 		if (!notification) {
+// 			return res.status(404).json({ msg: "Notification does not exist" });
+// 		}
+// 		//Check user
 
-		if (notification.recipient.toString() !== req.user.id) {
-			return res.status(401).json({ msg: "User not authorized" });
-		}
+// 		if (notification.recipient.toString() !== req.user.id) {
+// 			return res.status(401).json({ msg: "User not authorized" });
+// 		}
 
-		notification.read = true;
+// 		notification.read = true;
 
-		await profile.save();
-		res.json(profile);
-	} catch (err) {
-		res.status(500).send("Server error");
-	}
-});
+// 		await profile.save();
+// 		res.json(profile);
+// 	} catch (err) {
+// 		res.status(500).send("Server error");
+// 	}
+// });
 
 module.exports = router;

@@ -138,3 +138,20 @@ export const searchProfile = (query) => async (dispatch) => {
 		});
 	}
 };
+//Mark Notification as Read
+
+export const readNotification = (id) => async (dispatch) => {
+	try {
+		await axios.put(`/api/profile/notification/${id}`);
+
+		dispatch(getCurrentProfile());
+	} catch (error) {
+		dispatch({
+			type: PROFILE_ERROR,
+			payload: {
+				msg: error.response.data.msg,
+				status: error.response.status,
+			},
+		});
+	}
+};

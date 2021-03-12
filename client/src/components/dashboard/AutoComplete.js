@@ -1,6 +1,5 @@
 import React, { Fragment } from "react";
 import { Typography, Avatar, Divider } from "@material-ui/core";
-import img from "../../images/avatar.png";
 import { Link } from "react-router-dom";
 
 const AutoComplete = ({

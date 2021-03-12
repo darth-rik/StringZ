@@ -5,11 +5,13 @@ import MenuItem from "@material-ui/core/MenuItem";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { connect } from "react-redux";
 import { deletePost } from "../../../actions/post";
+import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 
 const ITEM_HEIGHT = 48;
 
 const DeleteMenu = ({ id, deletePost }) => {
+	let history = useHistory();
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const open = Boolean(anchorEl);
 
@@ -19,7 +21,11 @@ const DeleteMenu = ({ id, deletePost }) => {
 
 	const handleClose = () => {
 		setAnchorEl(null);
+	};
+	const deleteItem = () => {
+		setAnchorEl(null);
 		deletePost(id);
+		history.push("/dashboard");
 	};
 
 	return (
@@ -45,7 +51,7 @@ const DeleteMenu = ({ id, deletePost }) => {
 					},
 				}}
 			>
-				<MenuItem onClick={handleClose}>Delete</MenuItem>
+				<MenuItem onClick={deleteItem}>Delete</MenuItem>
 			</Menu>
 		</div>
 	);

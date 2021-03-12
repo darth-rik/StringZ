@@ -9,6 +9,7 @@ import {
 import { connect } from "react-redux";
 import { deleteComment } from "../../../actions/post";
 import PropTypes from "prop-types";
+import Moment from "react-moment";
 
 const Comment = ({
 	postId,
@@ -39,7 +40,7 @@ const Comment = ({
 							fontWeight: "lighter",
 						}}
 					>
-						2 hours ago
+						<Moment fromNow date={date} />
 					</p>
 				</div>
 				{!auth.loading && user === auth.user._id && (
@@ -62,6 +63,7 @@ const Comment = ({
 					marginBottom: "1rem",
 					lineHeight: "1.5rem",
 					marginTop: "1rem",
+					wordWrap: "break-word",
 				}}
 				variant='body2'
 			>

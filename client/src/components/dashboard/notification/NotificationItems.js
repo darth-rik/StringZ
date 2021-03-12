@@ -1,36 +1,44 @@
-import React, { Fragment } from "react";
+import React, { createRef, Fragment } from "react";
 import Typography from "@material-ui/core/Typography";
 import MenuItem from "@material-ui/core/MenuItem";
 import { makeStyles } from "@material-ui/core/styles";
 import img from "../../../images/avatar.png";
-import { Divider } from "@material-ui/core";
+import { Button, Divider } from "@material-ui/core";
+import Moment from "react-moment";
+import { readNotification } from "../../../actions/profile";
+import { connect } from "react-redux";
+
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
-	sectionDesktop: {
-		gridRow: "2",
-		gridColumn: "2",
+	mobileSection: {
+		padding: "1rem 2rem",
+		backgroundColor: "",
+		display: "flex",
+		flexDirection: "column",
+		justifyItems: "center",
+
 		[theme.breakpoints.up("md")]: {
-			gridRow: "1",
-			gridColumn: "3",
+			display: "grid",
+			gridTemplateColumns: "repeat(3,1fr)",
+			gap: "1rem",
+			justifyItems: "center",
 		},
 	},
 }));
 
-const NotificationItems = () => {
+const NotificationItems = ({ notification, readNotification, close }) => {
 	const classes = useStyles();
+
+	const onClick = async () => {
+		readNotification(notification._id);
+		close();
+	};
+
 	return (
-		<Fragment>
-			<MenuItem
-				style={{
-					padding: "1rem 2rem",
-					backgroundColor: "",
-					display: "grid",
-					gridTemplateColumns: "repeat(3,1fr)",
-					gap: "1rem",
-					justifyItems: "center",
-				}}
-				// onClick={handleMenuClose}
-			>
+		<Link to={`/post/${notification.postId}`}>
+			<MenuItem style={{}} className={classes.mobileSection} onClick={onClick}>
 				<img
 					style={{
 						height: "3rem",
@@ -38,19 +46,27 @@ const NotificationItems = () => {
 						borderRadius: "50rem",
 						// marginRight: "3rem",
 					}}
-					src={img}
+					src={`../images/${notification.avatar}`}
+					// src=''
 					alt=''
 				/>
-				<Typography style={{ marginRight: "" }}>
-					Luigi's Pizza liked your post
+				<Typography style={{ textAlign: "center" }}>
+					{/* {el.name} {el.commentId ? "commented" : "liked"} your post */}
+					{notification.name} has{" "}
+					{notification.message === "like" ? "liked" : "commented on"} your post
 				</Typography>
-				<Typography variant='caption' className={classes.sectionDesktop}>
-					4days ago
+				<Typography variant='caption'>
+					<Moment fromNow date={notification.date} />
 				</Typography>
 			</MenuItem>
+
 			<Divider />
-		</Fragment>
+		</Link>
 	);
 };
 
-export default NotificationItems;
+NotificationItems.propTypes = {
+	readNotification: PropTypes.func.isRequired,
+};
+
+export default connect(null, { readNotification })(NotificationItems);

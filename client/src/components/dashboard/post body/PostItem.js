@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
 	Divider,
@@ -9,11 +9,13 @@ import {
 	Typography,
 } from "@material-ui/core/";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
-import ThumbDownAltIcon from "@material-ui/icons/ThumbDownAlt";
+
+import ThumbUpAltOutlined from "@material-ui/icons/ThumbUpAltOutlined";
 import MessageIcon from "@material-ui/icons/Message";
 import DeleteMenu from "./DeleteMenu";
 import Comment from "./Comment";
 
+import { Link } from "react-router-dom";
 import Moment from "react-moment";
 import { connect } from "react-redux";
 import { addLike, removeLike, addComment } from "../../../actions/post";
@@ -40,27 +42,31 @@ const PostItem = ({
 	addLike,
 	removeLike,
 	addComment,
+	profile,
 }) => {
-	// useEffect(() => {
-	// 	getPost(_id);
-	// });
+	const likedPost = () => {
+		if (likes.find((el) => el.user === auth.user._id)) return true;
+		else return false;
+	};
+
 	const classes = useStyles();
 	const commentPanel = useRef();
 	const [comment, setComment] = useState(false);
-	const [like, setLike] = useState(false);
+
 	const [value, setValue] = useState("");
 
 	const toggleComments = () => {
-		comment ? setComment(false) : setComment(true);
+		if (comment) {
+			setComment(false);
+		} else {
+			setComment(true);
+		}
 	};
 	const addLikes = () => {
-		setLike(true);
 		addLike(_id);
 	};
 	const removeLikes = () => {
 		removeLike(_id);
-
-		setLike(false);
 	};
 
 	const onChange = (e) => {
@@ -72,6 +78,20 @@ const PostItem = ({
 		addComment(_id, { text: value });
 		setValue("");
 	};
+
+	const likeButton = likedPost() ? (
+		<ThumbUpAltIcon
+			onClick={removeLikes}
+			style={{ marginRight: ".5rem", cursor: "pointer" }}
+			color='primary'
+		/>
+	) : (
+		<ThumbUpAltOutlined
+			onClick={addLikes}
+			style={{ marginRight: ".5rem", cursor: "pointer" }}
+			color='primary'
+		/>
+	);
 
 	return (
 		<div className={classes.postComponent}>
@@ -90,15 +110,18 @@ const PostItem = ({
 						padding: "1.5rem",
 					}}
 				>
-					<Avatar
-						style={{ height: "5rem", width: "5rem", marginRight: "1.5rem" }}
-						src={`./images/${avatar}`}
-						alt=''
-					/>
+					<Link to={`/profile/${user}`}>
+						<Avatar
+							style={{ height: "5rem", width: "5rem", marginRight: "1.5rem" }}
+							src={avatar && `../images/${avatar}`}
+							alt=''
+						/>
+					</Link>
 					<div>
 						<p style={{ fontWeight: "bold" }}>{name}</p>
 						<p style={{ fontWeight: "lighter", marginTop: "-.5rem" }}>
-							<Moment format='YYYY/MM/DD'>{date}</Moment>
+							{/* {moment([date]).fromNow()} */}
+							<Moment fromNow date={date} />
 						</p>
 					</div>
 				</div>
@@ -109,6 +132,7 @@ const PostItem = ({
 						margin: "auto",
 						marginBottom: "1rem",
 						lineHeight: "1.5rem",
+						wordWrap: "break-word",
 					}}
 					variant='subtitle1'
 				>
@@ -131,21 +155,7 @@ const PostItem = ({
 							alignItems: "center",
 						}}
 					>
-						<ThumbUpAltIcon
-							style={{
-								marginRight: ".1rem",
-								cursor: "pointer",
-							}}
-							onClick={addLikes}
-						/>
-						({likes.length}){" "}
-						<ThumbDownAltIcon
-							style={{
-								marginRight: ".5rem",
-								cursor: "pointer",
-							}}
-							onClick={removeLikes}
-						/>
+						{likeButton}({likes.length}){" "}
 					</li>
 					<li
 						style={{
@@ -184,6 +194,7 @@ const PostItem = ({
 				<div style={{ display: "flex" }}>
 					<Avatar
 						style={{ height: "4rem", width: "4rem", marginRight: "2rem" }}
+						src={profile && `../images/${profile.avatar.avatar}`}
 					/>
 					<form
 						style={{ display: "flex", flexDirection: "column", width: "80%" }}
@@ -210,7 +221,6 @@ const PostItem = ({
 		</div>
 	);
 };
-
 PostItem.propTypes = {
 	post: PropTypes.object.isRequired,
 	auth: PropTypes.object.isRequired,
@@ -221,6 +231,7 @@ PostItem.propTypes = {
 
 const mapStateToProps = (state) => ({
 	auth: state.auth,
+	profile: state.profile.profile,
 });
 
 export default connect(mapStateToProps, { addLike, removeLike, addComment })(

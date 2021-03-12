@@ -108,9 +108,25 @@ const Register = ({ setAlert, register, isAuthenticated }) => {
 			<Button variant='contained' color='primary' size='large' type='submit'>
 				Register
 			</Button>
-			<Link to='/' style={{ color: "black" }}>
-				Back to Home
-			</Link>
+
+			<Typography variant='subtitle2'>
+				Have an account? Click here to
+				<Link to='/login'>
+					{" "}
+					<strong>
+						<u>Login</u>
+					</strong>{" "}
+				</Link>
+			</Typography>
+			<Typography variant='subtitle2'>
+				Back to
+				<Link to='/'>
+					{" "}
+					<strong>
+						<u>Home</u>
+					</strong>{" "}
+				</Link>
+			</Typography>
 		</form>
 	);
 };

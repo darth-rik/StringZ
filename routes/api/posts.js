@@ -124,7 +124,7 @@ router.put("/like/:id", auth, async (req, res) => {
 			return res.status(400).json({ msg: "Post already liked" });
 		}
 
-		post.likes.unshift({ user: req.user.id, liked: true });
+		post.likes.unshift({ user: req.user.id });
 		await post.save();
 
 		//Create a like notification
@@ -141,17 +141,17 @@ router.put("/like/:id", auth, async (req, res) => {
 			const likeNotif = {
 				read: false,
 
-				creator: req.user.id,
+				message: "like",
 
 				recipient: recipient.user,
 
-				post: req.params.id,
+				postId: req.params.id,
 
 				name: currentUser.artistName,
 				avatar: currentUser.avatar.avatar,
 			};
 
-			recipient.notification.likeNotif.unshift(likeNotif);
+			recipient.notification.unshift(likeNotif);
 
 			await recipient.save();
 		}
@@ -189,12 +189,19 @@ router.put("/unlike/:id", auth, async (req, res) => {
 		await post.save();
 		// Delete like notification
 		const recipient = await Profile.findOne({ user: post.user });
+		const currentUser = await Profile.findOne({ user: req.user.id });
 		if (recipient.user.toString() !== req.user.id) {
-			const removeIndex = recipient.notification.likeNotif
-				.map((like) => like.creator.toString())
-				.indexOf(req.user.id);
-			recipient.notification.likeNotif.splice(removeIndex, 1);
+			const removeIndex = recipient.notification
+				.map((like) => like.message === "like" && like.name)
+				.indexOf(currentUser.artistName);
+			// .filter((el) => el !== currentUser.artistName);
+
+			// console.log(post.name);
+			console.log(removeIndex);
+
+			recipient.notification.splice(removeIndex, 1);
 			await recipient.save();
+			// console.log(recipient.notification);
 		}
 		res.json(post.likes);
 	} catch (err) {
@@ -238,26 +245,22 @@ router.post(
 
 			const recipient = await Profile.findOne({ user: post.user });
 
-			const comment = post.comments[0];
-
 			//Check if comment is made by the current user
 			if (recipient.user.toString() !== req.user.id) {
 				const commentNotif = {
 					read: false,
 
-					creator: req.user.id,
+					message: "comment",
 
 					recipient: recipient.user,
 
-					commentId: comment._id,
-
-					post: req.params.id,
+					postId: req.params.id,
 
 					name: user.artistName,
 					avatar: user.avatar.avatar,
 				};
 
-				recipient.notification.commentNotif.unshift(commentNotif);
+				recipient.notification.unshift(commentNotif);
 
 				await recipient.save();
 			}
@@ -297,13 +300,18 @@ router.delete("/comment/:id/:comment_id", auth, async (req, res) => {
 		}
 
 		const recipient = await Profile.findOne({ user: post.user });
+		const currentUser = await Profile.findOne({ user: req.user.id });
 
 		if (recipient.user.toString() !== req.user.id) {
-			const index = recipient.notification.commentNotif
-				.map((el) => el.commentId.toString())
-				.indexOf(req.params.comment_id);
+			const removeIndex = recipient.notification
+				.map((like) => like.message === "comment" && like.name)
+				.indexOf(currentUser.artistName);
+			// .filter((el) => el !== currentUser.artistName);
 
-			recipient.notification.commentNotif.splice(index, 1);
+			// console.log(post.name);
+			console.log(removeIndex);
+
+			recipient.notification.splice(removeIndex, 1);
 
 			await recipient.save();
 		}

@@ -133,7 +133,6 @@ const Navbar = ({
 	profile: { profiles, profile },
 	searchProfile,
 	getCurrentProfile,
-	auth,
 }) => {
 	useEffect(() => {
 		getCurrentProfile();
@@ -142,7 +141,7 @@ const Navbar = ({
 	const classes = useStyles();
 	const [anchorEl, setAnchorEl] = React.useState(null);
 	const [notifEl, setNotifEl] = React.useState(null);
-
+	const [value, setValue] = React.useState("");
 	const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 	const [open, setOpen] = React.useState(false);
 	const [close, setClose] = React.useState(false);
@@ -152,6 +151,10 @@ const Navbar = ({
 	};
 	const handleClose = () => {
 		setOpen(false);
+	};
+
+	const onChange = (e) => {
+		setValue(e.target.value);
 	};
 
 	const isMenuOpen = Boolean(anchorEl);
@@ -199,6 +202,7 @@ const Navbar = ({
 
 	const closeList = () => {
 		setClose(true);
+		setValue("");
 	};
 
 	const menuId = "primary-search-account-menu";
@@ -232,7 +236,7 @@ const Navbar = ({
 			style={{ width: "100vw" }}
 		>
 			<div>
-				<Notification />
+				<Notification close={handleMenuClose} profiles={profile} />
 			</div>
 		</Menu>
 	);
@@ -258,8 +262,7 @@ const Navbar = ({
 					<Badge
 						badgeContent={
 							profile &&
-							profile.notification.likeNotif.length +
-								profile.notification.commentNotif.length
+							profile.notification.filter((el) => el.read === false).length
 						}
 						color='secondary'
 					>
@@ -319,6 +322,8 @@ const Navbar = ({
 							</div>
 							<InputBase
 								onKeyUp={search}
+								onChange={onChange}
+								value={value}
 								style={{ width: "100%" }}
 								placeholder='Search for artists/bands…'
 								classes={{
@@ -373,9 +378,7 @@ const Navbar = ({
 						>
 							<Badge
 								badgeContent={
-									profile &&
-									profile.notification.likeNotif.length +
-										profile.notification.commentNotif.length
+									profile.notification.filter((el) => el.read === false).length
 								}
 								color='secondary'
 							>

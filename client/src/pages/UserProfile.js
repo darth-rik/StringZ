@@ -126,33 +126,33 @@ const UserProfile = ({
 
 								<Typography variant='caption'>
 									{" "}
-									{user.social.spotify && (
+									{user.social && user.social.spotify && (
 										<a href='#'> https://www.spotify.com</a>
 									)}
 								</Typography>
 
 								<Typography variant='caption'>
 									{" "}
-									{user.social.amazonMusic && (
+									{user.social && user.social.amazonMusic && (
 										<a href='#'> https://www.amazonmusic.com</a>
 									)}
 								</Typography>
 
 								<Typography variant='caption'>
 									{" "}
-									{user.social.appleMusic && (
+									{user.social && user.social.appleMusic && (
 										<a href='#'> https://www.applemusic.com</a>
 									)}
 								</Typography>
 								<Typography variant='caption'>
 									{" "}
-									{user.social.youtube && (
+									{user.social && user.social.youtube && (
 										<a href='#'> https://www.applemusic.com</a>
 									)}
 								</Typography>
 								<Typography variant='caption'>
 									{" "}
-									{user.social.soundcloud && (
+									{user.social && user.social.soundcloud && (
 										<a href='#'> https://www.applemusic.com</a>
 									)}
 								</Typography>
@@ -170,13 +170,13 @@ const UserProfile = ({
 								</Typography>
 							</div>
 							<div style={{ marginTop: ".5rem" }}>
-								{user.social.facebook && (
+								{user.social && user.social.facebook && (
 									<FacebookIcon style={{ fill: "blue", cursor: "pointer" }} />
 								)}
-								{user.social.twitter && (
+								{user.social && user.social.twitter && (
 									<TwitterIcon style={{ fill: "blue", cursor: "pointer" }} />
 								)}
-								{user.social.instagram && (
+								{user.social && user.social.instagram && (
 									<InstagramIcon
 										style={{ fill: "orange", cursor: "pointer" }}
 									/>

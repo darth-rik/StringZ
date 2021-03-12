@@ -57,71 +57,38 @@ const ProfileSchema = mongoose.Schema({
 		},
 	},
 
-	notification: {
-		likeNotif: [
-			{
-				read: {
-					type: Boolean,
-				},
-
-				creator: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "User",
-				},
-
-				recipient: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "User",
-				},
-
-				name: {
-					type: String,
-				},
-
-				avatar: {
-					type: String,
-				},
-				date: {
-					type: Date,
-					default: Date.now,
-				},
+	notification: [
+		{
+			read: {
+				type: Boolean,
 			},
-		],
-		commentNotif: [
-			{
-				read: {
-					type: Boolean,
-				},
 
-				creator: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "User",
-				},
-
-				recipient: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "User",
-				},
-
-				commentId: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "Post",
-				},
-
-				name: {
-					type: String,
-				},
-
-				avatar: {
-					type: String,
-				},
-				date: {
-					type: Date,
-					default: Date.now,
-				},
+			message: {
+				type: String,
 			},
-		],
-	},
+
+			recipient: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "User",
+			},
+
+			postId: {
+				type: String,
+			},
+
+			name: {
+				type: String,
+			},
+
+			avatar: {
+				type: String,
+			},
+			date: {
+				type: Date,
+				default: Date.now,
+			},
+		},
+	],
 
 	date: {
 		type: Date,
