@@ -56,17 +56,7 @@ const Comment = ({
 					</Button>
 				)}
 			</div>
-			<Typography
-				style={{
-					width: "90%",
-					margin: "auto",
-					marginBottom: "1rem",
-					lineHeight: "1.5rem",
-					marginTop: "1rem",
-					wordWrap: "break-word",
-				}}
-				variant='body2'
-			>
+			<Typography style={styles.commentBody} variant='body2'>
 				{text}
 			</Typography>
 
@@ -85,5 +75,16 @@ Comment.propTypes = {
 const mapStateToProps = (state) => ({
 	auth: state.auth,
 });
+
+const styles = {
+	commentBody: {
+		width: "90%",
+		margin: "auto",
+		marginBottom: "1rem",
+		lineHeight: "1.5rem",
+		marginTop: "1rem",
+		wordWrap: "break-word",
+	},
+};
 
 export default connect(mapStateToProps, { deleteComment })(Comment);

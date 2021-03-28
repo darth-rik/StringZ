@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { Typography, Avatar, Divider } from "@material-ui/core";
 import { Link } from "react-router-dom";
 

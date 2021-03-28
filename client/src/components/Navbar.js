@@ -1,4 +1,16 @@
-import React, { Fragment, useEffect } from "react";
+import React, { useEffect } from "react";
+
+import PostInput from "./PostInput";
+
+import { connect } from "react-redux";
+import { logout } from "../actions/auth";
+import { searchProfile } from "../actions/profile";
+import { getCurrentProfile } from "../actions/profile";
+
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
+
+//Material-UI
 import { fade, makeStyles, withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -16,26 +28,10 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import { Avatar } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
-
 import Dialog from "@material-ui/core/Dialog";
-
 import MuiDialogContent from "@material-ui/core/DialogContent";
-
-import TextField from "@material-ui/core/TextField";
 import Notification from "./dashboard/notification/Notification";
 import AutoComplete from "./dashboard/AutoComplete";
-
-import img from "../images/avatar.png";
-import LogoBlack from "../images/logo-black.png";
-import PostInput from "./PostInput";
-
-import { connect } from "react-redux";
-import { logout } from "../actions/auth";
-import { searchProfile } from "../actions/profile";
-import { getCurrentProfile } from "../actions/profile";
-
-import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -90,12 +86,11 @@ const useStyles = makeStyles((theme) => ({
 	},
 
 	postInput: {
+		margin: "0 auto",
 		width: "70vw",
-		height: "15rem",
 
 		[theme.breakpoints.up("md")]: {
-			width: "30vw",
-			overflow: "hidden",
+			width: "40vw",
 		},
 	},
 	autoSuggestList: {
@@ -130,13 +125,13 @@ const DialogContent = withStyles((theme) => ({
 
 const Navbar = ({
 	logout,
-	profile: { profiles, profile },
+	profile: { profiles, profile, loading },
 	searchProfile,
 	getCurrentProfile,
 }) => {
 	useEffect(() => {
 		getCurrentProfile();
-	}, [getCurrentProfile]);
+	}, []);
 
 	const classes = useStyles();
 	const [anchorEl, setAnchorEl] = React.useState(null);
@@ -255,7 +250,6 @@ const Navbar = ({
 			<MenuItem onClick={handleNotificationOpen}>
 				<IconButton
 					aria-controls='open-notification'
-					aria-label='show 11 new notifications'
 					color='inherit'
 					aria-haspopup='true'
 				>
@@ -280,7 +274,7 @@ const Navbar = ({
 				>
 					<AccountCircle />
 				</IconButton>
-				<p>{profile ? profile.artistName : "User1234"}</p>
+				<p>{profile && profile.artistName}</p>
 			</MenuItem>
 			<MenuItem onClick={handlePostOpen}>
 				<IconButton
@@ -296,135 +290,140 @@ const Navbar = ({
 		</Menu>
 	);
 
-	return profile ? (
-		<div className={classes.grow}>
-			<AppBar position='fixed'>
-				<Toolbar>
-					<Link to='/dashboard'>
-						<IconButton
-							edge='start'
-							className={classes.menuButton}
-							color='inherit'
-							// aria-label='open drawer'
-						>
-							<img
-								src={LogoBlack}
-								style={{ height: "2rem", width: "2rem" }}
-								alt=''
-							/>
-						</IconButton>
-					</Link>
-
-					<div style={{ width: "100%" }}>
-						<div className={classes.search}>
-							<div className={classes.searchIcon}>
-								<SearchIcon />
-							</div>
-							<InputBase
-								onKeyUp={search}
-								onChange={onChange}
-								value={value}
-								style={{ width: "100%" }}
-								placeholder='Search for artists/bands…'
-								classes={{
-									root: classes.inputRoot,
-									input: classes.inputInput,
-								}}
-								inputProps={{ "aria-label": "search" }}
-							/>
-							{profiles.length > 0 && (
-								<div
-									onClick={closeList}
-									style={{ display: close ? "none" : "block" }}
-									className={classes.autoSuggestList}
-								>
-									{profiles.map((data) => (
-										<AutoComplete
-											key={data._id}
-											data={data}
-											close={closeList}
-										/>
-									))}
-								</div>
-							)}
-						</div>
-					</div>
-					<div className={classes.grow} />
-					<div className={classes.sectionDesktop}>
-						<IconButton
-							edge='end'
-							aria-label='account of current user'
-							aria-controls={menuId}
-							aria-haspopup='true'
-							onClick={handleProfileMenuOpen}
-							color='inherit'
-						>
-							<Typography variant='subtitle2'>
-								{profile ? profile.artistName : "User1234"}
-							</Typography>
-							<Avatar
-								src={
-									profile.avatar.avatar && `/images/${profile.avatar.avatar}`
-								}
-								style={{ margin: " 0 1rem" }}
-								alt=''
-							/>
-						</IconButton>
-						<IconButton
-							aria-controls='open-notification'
-							aria-label='show 17 new notifications'
-							color='inherit'
-							onClick={handleNotificationOpen}
-						>
-							<Badge
-								badgeContent={
-									profile.notification.filter((el) => el.read === false).length
-								}
-								color='secondary'
+	return (
+		profile && (
+			<div className={classes.grow}>
+				<AppBar position='fixed'>
+					<Toolbar>
+						<Link to='/dashboard'>
+							<IconButton
+								edge='start'
+								className={classes.menuButton}
+								color='inherit'
+								// aria-label='open drawer'
 							>
-								<NotificationsIcon />
-							</Badge>
-						</IconButton>
-						<IconButton
-							aria-controls=''
-							aria-label='show 17 new notifications'
-							color='inherit'
-							onClick={handlePostOpen}
-						>
-							<AddIcon />
-						</IconButton>
-					</div>
-					<div className={classes.sectionMobile}>
-						<IconButton
-							aria-label='show more'
-							aria-controls={mobileMenuId}
-							aria-haspopup='true'
-							onClick={handleMobileMenuOpen}
-							color='inherit'
-						>
-							<MoreIcon />
-						</IconButton>
-					</div>
-				</Toolbar>
-			</AppBar>
-			<Toolbar />
-			{renderMobileMenu}
-			{renderMenu}
-			{renderNotif}
-			<Dialog
-				maxWidth='xl'
-				onClose={handleClose}
-				aria-labelledby='customized-dialog-title'
-				open={open}
-			>
-				<DialogContent className={classes.postInput} dividers>
-					<div>
+								<img
+									src='../images/Logo.svg'
+									style={{
+										height: "2rem",
+										width: "2rem",
+										backgroundColor: "white",
+									}}
+									alt=''
+								/>
+							</IconButton>
+						</Link>
+
+						<div style={{ width: "100%" }}>
+							<div className={classes.search}>
+								<div className={classes.searchIcon}>
+									<SearchIcon />
+								</div>
+								<InputBase
+									onKeyUp={search}
+									onChange={onChange}
+									value={value}
+									style={{ width: "100%" }}
+									placeholder='Search for artists/bands…'
+									classes={{
+										root: classes.inputRoot,
+										input: classes.inputInput,
+									}}
+									inputProps={{ "aria-label": "search" }}
+								/>
+								{profiles.length > 0 && (
+									<div
+										onClick={closeList}
+										style={{ display: close ? "none" : "block" }}
+										className={classes.autoSuggestList}
+									>
+										{profiles.map((data) => (
+											<AutoComplete
+												key={data._id}
+												data={data}
+												close={closeList}
+											/>
+										))}
+									</div>
+								)}
+							</div>
+						</div>
+						<div className={classes.grow} />
+						<div className={classes.sectionDesktop}>
+							<IconButton
+								edge='end'
+								aria-label='account of current user'
+								aria-controls={menuId}
+								aria-haspopup='true'
+								onClick={handleProfileMenuOpen}
+								color='inherit'
+							>
+								<Typography variant='subtitle2'>
+									{profile.artistName}
+								</Typography>
+								<Avatar
+									src={
+										profile.avatar &&
+										profile.avatar.avatar &&
+										`/images/${profile.avatar.avatar}`
+									}
+									style={{ margin: " 0 1rem" }}
+									alt=''
+								/>
+							</IconButton>
+							<IconButton
+								aria-controls='open-notification'
+								color='inherit'
+								onClick={handleNotificationOpen}
+							>
+								<Badge
+									badgeContent={
+										profile.notification.filter((el) => el.read === false)
+											.length
+									}
+									color='secondary'
+								>
+									<NotificationsIcon />
+								</Badge>
+							</IconButton>
+							<IconButton
+								aria-controls=''
+								color='inherit'
+								onClick={handlePostOpen}
+							>
+								<AddIcon />
+							</IconButton>
+						</div>
+						<div className={classes.sectionMobile}>
+							<IconButton
+								aria-label='show more'
+								aria-controls={mobileMenuId}
+								aria-haspopup='true'
+								onClick={handleMobileMenuOpen}
+								color='inherit'
+							>
+								<MoreIcon />
+							</IconButton>
+						</div>
+					</Toolbar>
+				</AppBar>
+				<Toolbar />
+				{renderMobileMenu}
+				{renderMenu}
+				{renderNotif}
+				<Dialog
+					maxWidth='lg'
+					onClose={handleClose}
+					aria-labelledby='customized-dialog-title'
+					open={open}
+				>
+					<DialogContent className={classes.postInput} dividers>
 						<PostInput closePost={handleClose} />
-					</div>
-				</DialogContent>
-			</Dialog>
-		</div>
-	) : null;
+					</DialogContent>
+				</Dialog>
+			</div>
+		)
+	);
 };
 
 Navbar.propTypes = {

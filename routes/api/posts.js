@@ -97,6 +97,16 @@ router.delete("/:id", auth, async (req, res) => {
 
 		await post.remove();
 
+		// Delete notification connected to post
+
+		const recipient = await Profile.findOne({ user: post.user });
+
+		recipient.notification = recipient.notification.filter(
+			(not) => not.postId.toString() !== req.params.id
+		);
+
+		await recipient.save();
+
 		res.json({ msg: "Post is removed" });
 	} catch (error) {
 		if (error.kind === "ObjectId") {
@@ -299,17 +309,18 @@ router.delete("/comment/:id/:comment_id", auth, async (req, res) => {
 			return res.status(401).json({ msg: "User not authorized" });
 		}
 
+		//Delete comment notification
+
 		const recipient = await Profile.findOne({ user: post.user });
 		const currentUser = await Profile.findOne({ user: req.user.id });
 
 		if (recipient.user.toString() !== req.user.id) {
 			const removeIndex = recipient.notification
-				.map((like) => like.message === "comment" && like.name)
+				.map((comm) => comm.message === "comment" && comm.name)
 				.indexOf(currentUser.artistName);
 			// .filter((el) => el !== currentUser.artistName);
 
 			// console.log(post.name);
-			console.log(removeIndex);
 
 			recipient.notification.splice(removeIndex, 1);
 

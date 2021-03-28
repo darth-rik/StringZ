@@ -3,11 +3,7 @@ const router = express.Router();
 const auth = require("../../middleware/auth");
 const images = require("../../middleware/images");
 const { check, validationResult } = require("express-validator");
-const bcrypt = require("bcryptjs");
 
-const config = require("config");
-const jwt = require("jsonwebtoken");
-const User = require("../../models/User");
 const Profile = require("../../models/Profile");
 const Photo = require("../../models/Photo");
 
@@ -49,6 +45,7 @@ router.post("/", [
 		const {
 			artistName,
 			bio,
+			website,
 			genre,
 			equipments,
 			youtube,
@@ -78,10 +75,10 @@ router.post("/", [
 
 		if (artistName) profileFields.artistName = artistName;
 		if (bio) profileFields.bio = bio;
+		if (website) profileFields.website = website;
 
 		if (genre) profileFields.genre = genre;
-		if (equipments)
-			profileFields.equipments = equipments.split(",").map((eq) => eq.trim());
+		if (equipments) profileFields.equipments = equipments;
 
 		profileFields.social = {};
 
@@ -125,7 +122,7 @@ router.post(
 	"/pic",
 	[
 		auth,
-		[check("avatar", "Picture is required").not().isEmpty()],
+		check("avatar", "Picture is required").isEmpty().not(),
 		images.uploadUserImage,
 	],
 	async (req, res) => {
@@ -141,39 +138,26 @@ router.post(
 			let avatar = await Photo.findOne({ user: req.user.id });
 
 			//Update
+			if (avatar) {
+				avatar = await Photo.findOneAndUpdate(
+					{ user: req.user.id },
+					{ $set: photoFields },
+					{ new: true }
+				);
 
-			avatar = await Photo.findOneAndUpdate(
-				{ user: req.user.id },
-				{ $set: photoFields },
-				{ new: true }
-			);
+				return res.json(avatar);
+			}
+
 			//Create
-			return res.json(avatar);
 
-			// avatar = new Photo(photoFields);
-			// await avatar.save();
-			// res.json(avatar);
+			avatar = new Photo(photoFields);
+			await avatar.save();
+			res.json(avatar);
 		} catch (err) {
 			res.status(500).send("Server error");
 		}
 	}
 );
-
-// router.get("/pic", auth, async (req, res) => {
-// 	try {
-// 		const photo = await Photo.findOne({
-// 			user: req.user.id,
-// 		});
-
-// 		if (!photo) {
-// 			return res.status(400).json({ msg: "No photo found for user" });
-// 		}
-
-// 		res.json(photo);
-// 	} catch (err) {
-// 		res.status(500).send("Server error");
-// 	}
-// });
 
 //@route   GET api/profile/search?query
 //@desc    Search profiles by name
@@ -192,6 +176,28 @@ router.get("/search", async (req, res) => {
 							prefixLength: 2,
 						},
 					},
+					// compound: {
+					// 	should: [
+					// 		{
+					// 			autocomplete: {
+					// 				query: `${req.query.query}`,
+					// 				path: "artistName",
+					// 				fuzzy: {
+					// 					maxEdits: 2,
+					// 					prefixLength: 2,
+					// 				},
+					// 			},
+					// 			autocomplete: {
+					// 				query: `${req.query.query}`,
+					// 				path: "genre",
+					// 				fuzzy: {
+					// 					maxEdits: 2,
+					// 					prefixLength: 2,
+					// 				},
+					// 			},
+					// 		},
+					// 	],
+					// },
 				},
 			},
 		]);
@@ -267,39 +273,5 @@ router.put("/notification/:id", auth, async (req, res) => {
 		res.status(500).send("Server error");
 	}
 });
-
-// //@route   PUT api/profile/:comment_id
-// //@desc    Mark notification as read
-// //@access  Private
-
-// router.put("/comment/:comment_id", auth, async (req, res) => {
-// 	try {
-// 		const profile = await Profile.findOne({ user: req.user.id });
-
-// 		if (!profile) {
-// 			return res.status(400).json({ msg: "No profile found for user" });
-// 		}
-
-// 		const notification = profile.notification.commentNotif.find(
-// 			(not) => not.id === req.params.comment_id
-// 		);
-
-// 		if (!notification) {
-// 			return res.status(404).json({ msg: "Notification does not exist" });
-// 		}
-// 		//Check user
-
-// 		if (notification.recipient.toString() !== req.user.id) {
-// 			return res.status(401).json({ msg: "User not authorized" });
-// 		}
-
-// 		notification.read = true;
-
-// 		await profile.save();
-// 		res.json(profile);
-// 	} catch (err) {
-// 		res.status(500).send("Server error");
-// 	}
-// });
 
 module.exports = router;

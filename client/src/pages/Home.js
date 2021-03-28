@@ -1,20 +1,18 @@
 import React from "react";
 import { Link, Redirect } from "react-router-dom";
-
 import { connect } from "react-redux";
+import Image from "../images/background-min.png";
+
+// Material UI
 import { makeStyles } from "@material-ui/core/styles";
-import Image from "../images/background.png";
 import { Button, Container, Typography } from "@material-ui/core";
 import Drawer from "@material-ui/core/Drawer";
 import clsx from "clsx";
 import List from "@material-ui/core/List";
 import Divider from "@material-ui/core/Divider";
 import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import MenuIcon from "@material-ui/icons/Menu";
-import LogoWhite from "../images/logo-white.png";
-import LogoBlack from "../images/logo-black.png";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
@@ -48,6 +46,31 @@ const useStyles = makeStyles((theme) => ({
 			display: "none",
 		},
 	},
+	logo: {
+		height: "4rem",
+		width: "4rem",
+		padding: "1rem",
+		margin: "auto",
+	},
+	container: {
+		fontWeight: "600",
+		display: "flex",
+		justifyContent: "space-between",
+		paddingTop: "2rem",
+	},
+	links: {
+		marginRight: "4rem",
+		cursor: "pointer",
+		color: "white",
+	},
+
+	menu: {
+		fontSize: "3rem",
+		fill: "white",
+		position: "absolute",
+		left: "1rem",
+		top: "1rem",
+	},
 }));
 
 const Home = ({ isAuthenticated }) => {
@@ -75,26 +98,17 @@ const Home = ({ isAuthenticated }) => {
 			onClick={toggleDrawer(anchor, false)}
 			onKeyDown={toggleDrawer(anchor, false)}
 		>
-			<img
-				src={LogoWhite}
-				alt=''
-				style={{
-					height: "4rem",
-					width: "4rem",
-
-					margin: "auto",
-				}}
-			/>
+			<img src='./images/Logo.svg' className={classes.logo} alt='' />
 
 			<Divider />
 			<List style={{ marginTop: "2rem" }}>
-				<Link to='/register' style={{ color: "black" }}>
+				<Link to='/register'>
 					<ListItem button>
 						<ListItemText primary='Register' />
 					</ListItem>
 				</Link>
 
-				<Link to='/login' style={{ color: "black" }}>
+				<Link to='/login'>
 					<ListItem button>
 						<ListItemText primary='Login' />
 					</ListItem>
@@ -105,27 +119,20 @@ const Home = ({ isAuthenticated }) => {
 
 	if (isAuthenticated) {
 		return <Redirect to='/dashboard' />;
-		// props.history.push("/dashboard");
 	}
 	return (
 		<div className={classes.root}>
-			<Container
-				maxWidth='xl'
-				style={{
-					fontWeight: "600",
-					display: "flex",
-					justifyContent: "space-between",
-					alignItems: "center",
-					paddingTop: "2rem",
-				}}
-			>
+			<Container maxWidth='xl' className={classes.container}>
 				<img
-					src={LogoBlack}
+					src='./images/Logo.svg'
+					style={{
+						backgroundColor: "white",
+						height: "4rem",
+						width: "4rem",
+					}}
 					alt=''
-					style={{ marginLeft: "2rem" }}
 					className={classes.sectionDesktop}
 				/>
-
 				<ul
 					className={classes.sectionDesktop}
 					style={{
@@ -136,19 +143,11 @@ const Home = ({ isAuthenticated }) => {
 				>
 					<Link to='/register'>
 						{" "}
-						<li
-							style={{
-								marginRight: "4rem",
-								cursor: "pointer",
-							}}
-						>
-							{" "}
-							Register
-						</li>
+						<li className={classes.links}> Register</li>
 					</Link>
 					<Link to='/login'>
 						{" "}
-						<li style={{ marginRight: "4rem", cursor: "pointer" }}>Login</li>
+						<li className={classes.links}>Login</li>
 					</Link>
 				</ul>
 
@@ -159,15 +158,7 @@ const Home = ({ isAuthenticated }) => {
 					style={{ position: "absolute", left: "1rem", top: "1rem" }}
 					className={classes.sectionMobile}
 				>
-					<MenuIcon
-						style={{
-							fontSize: "3rem",
-							fill: "white",
-							position: "absolute",
-							left: "1rem",
-							top: "1rem",
-						}}
-					/>
+					<MenuIcon className={classes.menu} />
 				</Button>
 				<Drawer
 					anchor='left'

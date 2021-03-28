@@ -1,13 +1,13 @@
 import React from "react";
 import Typography from "@material-ui/core/Typography";
 import NotificationItems from "./NotificationItems";
-import MenuItem from "@material-ui/core/MenuItem";
 import { Divider } from "@material-ui/core";
 
 const Notification = ({ profiles: { notification }, close }) => {
 	const closeNotif = () => {
 		close();
 	};
+
 	return (
 		<div
 			style={{
@@ -18,11 +18,6 @@ const Notification = ({ profiles: { notification }, close }) => {
 		>
 			<div
 				style={{
-					display: "grid",
-					gridTemplateColumns: "repeat(2, 1fr)",
-
-					justifyItems: "center",
-					alignItems: "center",
 					color: "blue",
 					padding: "1rem 2rem ",
 				}}

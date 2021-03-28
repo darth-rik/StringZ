@@ -1,17 +1,20 @@
 import React, { useState } from "react";
+import { connect } from "react-redux";
+import { createProfile } from "../../actions/profile";
+import PropTypes from "prop-types";
+
+//Material UI
 import Backdrop from "@material-ui/core/Backdrop";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import { TextField, Typography } from "@material-ui/core";
-import { connect } from "react-redux";
-import { createProfile } from "../../actions/profile";
-
-import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
 	backdrop: {
 		zIndex: theme.zIndex.drawer + 1,
 		color: "#fff",
+		overflow: "scroll",
+		padding: "1rem",
 	},
 	form: {
 		width: "100%",
@@ -43,8 +46,8 @@ const BackDrop = ({ createProfile }) => {
 
 	const [formData, setFormData] = useState({
 		artistName: "",
-		genre: "",
-		equipments: "",
+		website: "",
+		bio: "",
 	});
 
 	const onChange = (e) =>
@@ -56,16 +59,9 @@ const BackDrop = ({ createProfile }) => {
 	const onSubmit = (e) => {
 		e.preventDefault();
 		createProfile(formData);
-		window.location.reload();
 
 		setOpen(false);
 	};
-	// const handleClose = () => {
-	// 	setOpen(false);
-	// };
-	// const handleToggle = () => {
-	// 	setOpen(!open);
-	// };
 
 	return (
 		<div>
@@ -81,11 +77,10 @@ const BackDrop = ({ createProfile }) => {
 					<div style={{ width: "100%" }}>
 						<TextField
 							variant='outlined'
-							label='Band Name / Artist Name'
+							label='Display Name'
 							name='artistName'
 							className={classes.textInputs}
 							onChange={onChange}
-							//
 							required
 						/>
 
@@ -99,15 +94,15 @@ const BackDrop = ({ createProfile }) => {
 					</div>
 					<TextField
 						variant='outlined'
-						label='Genre'
-						name='genre'
+						label='Website'
+						name='website'
 						onChange={onChange}
 						className={classes.textInputs}
 					/>
 					<TextField
 						variant='outlined'
-						label='Equipments '
-						name='equipments'
+						label='Bio '
+						name='bio'
 						onChange={onChange}
 						className={classes.textInputs}
 					/>

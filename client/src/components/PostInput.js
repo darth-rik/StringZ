@@ -1,16 +1,14 @@
 import React, { Fragment } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-import { Grid } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
-import Divider from "@material-ui/core/Divider";
 import { connect } from "react-redux";
 import { addPost } from "../actions/post";
 import PropTypes from "prop-types";
+import { useHistory } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
 	root: {
-		margin: "auto",
 		width: "100%",
 		display: "flex",
 		flexDirection: "column",
@@ -21,8 +19,9 @@ const useStyles = makeStyles((theme) => ({
 	},
 
 	input: {
-		height: "8rem",
+		height: "10rem",
 		fontSize: ".9rem",
+		overflow: "hidden",
 	},
 	[theme.breakpoints.up("md")]: {
 		input: {
@@ -34,6 +33,7 @@ const useStyles = makeStyles((theme) => ({
 
 const PostInput = ({ addPost, closePost }) => {
 	const classes = useStyles();
+	const history = useHistory();
 	const [text, setText] = React.useState("");
 
 	const handleChange = (event) => {
@@ -46,6 +46,7 @@ const PostInput = ({ addPost, closePost }) => {
 		addPost({ text });
 		setText("");
 		closePost();
+		history.push("/dashboard");
 	};
 
 	return (
@@ -56,11 +57,11 @@ const PostInput = ({ addPost, closePost }) => {
 				noValidate
 				autoComplete='off'
 			>
-				<div style={{ padding: "1rem", height: "" }}>
+				<div style={{ padding: "1rem" }}>
 					<TextField
 						label='Write Something..'
+						rows='8'
 						multiline
-						rowsMax={8}
 						value={text}
 						onChange={handleChange}
 						variant='outlined'
@@ -68,7 +69,6 @@ const PostInput = ({ addPost, closePost }) => {
 							className: classes.input,
 						}}
 					/>
-					{/* <textarea name='' id='' cols='30' rows='10'></textarea> */}
 				</div>
 				<Button
 					style={{ alignSelf: "center", marginBottom: "1rem" }}

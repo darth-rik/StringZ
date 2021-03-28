@@ -10,6 +10,10 @@ const ProfileSchema = mongoose.Schema({
 		required: true,
 	},
 
+	website: {
+		type: String,
+	},
+
 	bio: {
 		type: String,
 	},
@@ -24,7 +28,7 @@ const ProfileSchema = mongoose.Schema({
 	},
 
 	equipments: {
-		type: [String],
+		type: String,
 	},
 
 	social: {

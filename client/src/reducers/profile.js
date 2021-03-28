@@ -58,6 +58,7 @@ export default function (state = initialState, action) {
 				loading: true,
 				error: null,
 				profiles: [],
+				user: null,
 			};
 
 		default:

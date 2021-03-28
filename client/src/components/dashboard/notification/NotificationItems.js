@@ -1,15 +1,16 @@
-import React, { createRef, Fragment } from "react";
-import Typography from "@material-ui/core/Typography";
-import MenuItem from "@material-ui/core/MenuItem";
-import { makeStyles } from "@material-ui/core/styles";
-import img from "../../../images/avatar.png";
-import { Button, Divider } from "@material-ui/core";
+import React from "react";
+
 import Moment from "react-moment";
 import { readNotification } from "../../../actions/profile";
 import { connect } from "react-redux";
-
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+
+//Material-UI
+import Typography from "@material-ui/core/Typography";
+import MenuItem from "@material-ui/core/MenuItem";
+import { makeStyles } from "@material-ui/core/styles";
+import { Divider } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
 	mobileSection: {

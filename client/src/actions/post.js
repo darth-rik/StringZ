@@ -1,6 +1,7 @@
 import axios from "axios";
 
 import { setAlert } from "./alert";
+import { getCurrentProfile } from "./profile";
 
 import {
 	ADD_COMMENT,
@@ -88,6 +89,7 @@ export const deletePost = (postId) => async (dispatch) => {
 		});
 
 		dispatch(setAlert("Post removed", "success"));
+		dispatch(getCurrentProfile());
 	} catch (error) {
 		dispatch({
 			type: POST_ERROR,

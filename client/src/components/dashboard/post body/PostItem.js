@@ -1,4 +1,15 @@
 import React, { useState, useRef } from "react";
+
+import DeleteMenu from "./DeleteMenu";
+import Comment from "./Comment";
+
+import { Link } from "react-router-dom";
+import Moment from "react-moment";
+import { connect } from "react-redux";
+import { addLike, removeLike, addComment } from "../../../actions/post";
+import PropTypes from "prop-types";
+
+//Material-UI
 import { makeStyles } from "@material-ui/core/styles";
 import {
 	Divider,
@@ -9,17 +20,8 @@ import {
 	Typography,
 } from "@material-ui/core/";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
-
 import ThumbUpAltOutlined from "@material-ui/icons/ThumbUpAltOutlined";
 import MessageIcon from "@material-ui/icons/Message";
-import DeleteMenu from "./DeleteMenu";
-import Comment from "./Comment";
-
-import { Link } from "react-router-dom";
-import Moment from "react-moment";
-import { connect } from "react-redux";
-import { addLike, removeLike, addComment } from "../../../actions/post";
-import PropTypes from "prop-types";
 
 const useStyles = makeStyles((theme) => ({
 	postComponent: {
@@ -34,6 +36,10 @@ const useStyles = makeStyles((theme) => ({
 		postComponent: {
 			width: "70%",
 		},
+	},
+	likeButton: {
+		marginRight: ".5rem",
+		cursor: "pointer",
 	},
 }));
 const PostItem = ({
@@ -52,7 +58,6 @@ const PostItem = ({
 	const classes = useStyles();
 	const commentPanel = useRef();
 	const [comment, setComment] = useState(false);
-
 	const [value, setValue] = useState("");
 
 	const toggleComments = () => {
@@ -82,13 +87,13 @@ const PostItem = ({
 	const likeButton = likedPost() ? (
 		<ThumbUpAltIcon
 			onClick={removeLikes}
-			style={{ marginRight: ".5rem", cursor: "pointer" }}
+			className={classes.likeButton}
 			color='primary'
 		/>
 	) : (
 		<ThumbUpAltOutlined
 			onClick={addLikes}
-			style={{ marginRight: ".5rem", cursor: "pointer" }}
+			className={classes.likeButton}
 			color='primary'
 		/>
 	);
@@ -120,7 +125,6 @@ const PostItem = ({
 					<div>
 						<p style={{ fontWeight: "bold" }}>{name}</p>
 						<p style={{ fontWeight: "lighter", marginTop: "-.5rem" }}>
-							{/* {moment([date]).fromNow()} */}
 							<Moment fromNow date={date} />
 						</p>
 					</div>
@@ -194,7 +198,7 @@ const PostItem = ({
 				<div style={{ display: "flex" }}>
 					<Avatar
 						style={{ height: "4rem", width: "4rem", marginRight: "2rem" }}
-						src={profile && `../images/${profile.avatar.avatar}`}
+						src={profile.avatar && `../images/${profile.avatar.avatar}`}
 					/>
 					<form
 						style={{ display: "flex", flexDirection: "column", width: "80%" }}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Fragment } from "react";
-import Navbar from "../components/Navbar";
+
 import Spinner from "../components/layouts/Spinner";
 
 import { connect } from "react-redux";
@@ -8,6 +8,10 @@ import { getCurrentProfile } from "../actions/profile";
 import { createProfile } from "../actions/profile";
 import { createAvatar } from "../actions/profile";
 
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
+
+//Material-UI
 import Avatar from "@material-ui/core/Avatar";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
@@ -21,13 +25,10 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
-
 import FacebookIcon from "@material-ui/icons/Facebook";
 import TwitterIcon from "@material-ui/icons/Twitter";
 import InstagramIcon from "@material-ui/icons/Instagram";
 import EditIcon from "@material-ui/icons/Edit";
-
-import PropTypes from "prop-types";
 
 const styles = (theme) => ({
 	root: {
@@ -94,16 +95,19 @@ const DialogActions = withStyles((theme) => ({
 
 const Profile = ({
 	profile: { profile, loading },
+
 	getCurrentProfile,
 	createProfile,
 	createAvatar,
+
+	match,
 }) => {
 	const initialState = {
 		artistName: "",
 		genre: "",
 		equipments: "",
 		bio: "",
-
+		website: "",
 		youtube: "",
 		twitter: "",
 		facebook: "",
@@ -122,8 +126,9 @@ const Profile = ({
 	const [file, setFile] = useState(null);
 
 	useEffect(() => {
-		getCurrentProfile();
-		if (!loading && profile) {
+		if (!profile) getCurrentProfile();
+
+		if (profile && !loading) {
 			const profileData = { ...initialState };
 			for (const key in profile) {
 				if (key in profileData) profileData[key] = profile[key];
@@ -131,18 +136,18 @@ const Profile = ({
 			for (const key in profile.social) {
 				if (key in profileData) profileData[key] = profile.social[key];
 			}
-			if (Array.isArray(profileData.equipments))
-				profileData.equipments = profileData.equipments.join(", ");
+			// if (Array.isArray(profileData.equipments))
+			// 	profileData.equipments = profileData.equipments.join(", ");
 			setFormData(profileData);
 		}
-	}, [loading, getCurrentProfile]);
+	}, [loading, profile, getCurrentProfile]);
 
 	const {
 		artistName,
 		genre,
 		equipments,
 		bio,
-
+		website,
 		soundcloud,
 		amazonMusic,
 		spotify,
@@ -161,11 +166,11 @@ const Profile = ({
 	const onSubmit = (e) => {
 		e.preventDefault();
 
-		createProfile(formData);
+		createProfile(formData, match.params.id);
 
 		setOpen(false);
 
-		window.location.reload();
+		// window.location.reload();
 	};
 
 	const submitPhoto = (e) => {
@@ -173,7 +178,8 @@ const Profile = ({
 		if (!photo) {
 			return;
 		}
-		createAvatar(photo);
+		createAvatar(photo, match.params.id);
+
 		setOpenPhoto(false);
 	};
 	const handleEditOpen = () => {
@@ -189,7 +195,13 @@ const Profile = ({
 		setOpenPhoto(false);
 	};
 	const handlePic = (e) => {
-		setFile(URL.createObjectURL(e.target.files[0]));
+		let reader = new FileReader();
+
+		reader.onloadend = () => {
+			setFile(reader.result);
+		};
+
+		reader.readAsDataURL(e.target.files[0]);
 
 		const data = new FormData();
 		const image = e.target.files[0];
@@ -198,7 +210,7 @@ const Profile = ({
 		setPhoto(data);
 	};
 
-	return loading && profile === null ? (
+	return !profile || loading ? (
 		<Spinner />
 	) : (
 		<Fragment>
@@ -224,7 +236,11 @@ const Profile = ({
 							width: "10rem",
 							border: "2px solid white",
 						}}
-						src={profile.avatar.avatar && `../images/${profile.avatar.avatar}`}
+						src={
+							profile.avatar &&
+							profile.avatar.avatar &&
+							`../images/${profile.avatar.avatar}`
+						}
 						alt=''
 					/>
 
@@ -318,7 +334,7 @@ const Profile = ({
 							variant='h4'
 							style={{ fontWeight: "bolder", marginRight: "1rem" }}
 						>
-							{profile && profile.artistName}
+							{profile.artistName}
 						</Typography>
 
 						<EditIcon style={{ cursor: "pointer" }} onClick={handleEditOpen} />
@@ -336,7 +352,7 @@ const Profile = ({
 									<div className={classes.root}>
 										<div>
 											<TextField
-												label='Band Name / Artist Name'
+												label='Display name'
 												variant='outlined'
 												name='artistName'
 												value={artistName}
@@ -355,6 +371,14 @@ const Profile = ({
 												value={genre}
 												onChange={onChange}
 												label='Genre'
+												variant='outlined'
+											/>
+
+											<TextField
+												name='website'
+												value={website}
+												onChange={onChange}
+												label='Website'
 												variant='outlined'
 											/>
 
@@ -378,6 +402,20 @@ const Profile = ({
 												value={appleMusic}
 												onChange={onChange}
 												label='Apple Music Profile'
+												variant='outlined'
+											/>
+											<TextField
+												name='youtube'
+												value={youtube}
+												onChange={onChange}
+												label='Youtube Profile'
+												variant='outlined'
+											/>
+											<TextField
+												name='soundcloud'
+												value={soundcloud}
+												onChange={onChange}
+												label='Soundcloud Profile'
 												variant='outlined'
 											/>
 											<TextField
@@ -424,53 +462,134 @@ const Profile = ({
 					<div className={classes.links}>
 						<Typography variant='caption'>
 							{" "}
-							<a href='#'>https://www.anticlock.com</a>{" "}
+							<Fragment>
+								<strong>Website: </strong>
+								<a
+									target='_blank'
+									rel='noreferrer'
+									href={"https://" + profile.website}
+								>
+									{profile.website}
+								</a>{" "}
+							</Fragment>
 						</Typography>
 
 						<Typography variant='caption'>
 							{" "}
-							{spotify && <a href='#'> https://www.spotify.com</a>}
+							{profile.social && profile.social.spotify && (
+								<Fragment>
+									<strong>Spotify: </strong>
+									<a
+										target='_blank'
+										rel='noreferrer'
+										href={"https://" + profile.social.spotify}
+									>
+										{profile.social.spotify}
+									</a>
+								</Fragment>
+							)}
 						</Typography>
 
 						<Typography variant='caption'>
 							{" "}
-							{amazonMusic && <a href='#'> https://www.amazonmusic.com</a>}
+							{profile.social && profile.social.amazonMusic && (
+								<Fragment>
+									<strong>Amazon Music: </strong>
+									<a
+										target='_blank'
+										rel='noreferrer'
+										href={"https://" + profile.social.amazonMusic}
+									>
+										{profile.social.amazonMusic}
+									</a>
+								</Fragment>
+							)}
 						</Typography>
 
 						<Typography variant='caption'>
 							{" "}
-							{appleMusic && <a href='#'> https://www.applemusic.com</a>}
+							{profile.social && profile.social.appleMusic && (
+								<Fragment>
+									<strong>Apple Music: </strong>
+									<a
+										target='_blank'
+										rel='noreferrer'
+										href={"https://" + profile.social.appleMusic}
+									>
+										{profile.social.appleMusic}
+									</a>
+								</Fragment>
+							)}
 						</Typography>
 						<Typography variant='caption'>
 							{" "}
-							{youtube && <a href='#'> https://www.applemusic.com</a>}
+							{profile.social && profile.social.youtube && (
+								<Fragment>
+									<strong>Youtube: </strong>
+									<a
+										target='_blank'
+										rel='noreferrer'
+										href={"https://" + profile.social.youtube}
+									>
+										{profile.social.youtube}
+									</a>
+								</Fragment>
+							)}
 						</Typography>
 						<Typography variant='caption'>
 							{" "}
-							{soundcloud && <a href='#'> https://www.applemusic.com</a>}
+							{profile.social && profile.social.soundcloud && (
+								<Fragment>
+									<strong>Soundcloud: </strong>
+									<a
+										target='_blank'
+										rel='noreferrer'
+										href={"https://" + profile.social.soundcloud}
+									>
+										{profile.social.soundcloud}
+									</a>
+								</Fragment>
+							)}
 						</Typography>
 					</div>
 					<div>
 						<Typography variant='subtitle1'>
 							{" "}
-							<strong>Genre: </strong> {profile && profile.genre}
+							<strong>Genre: </strong> {profile.genre}
 						</Typography>
 					</div>
 					<div>
 						<Typography variant='subtitle1'>
-							<strong>Equipments:</strong>{" "}
-							{profile && profile.equipments.map((el) => el).join(" , ")}
+							<strong>Equipments:</strong> {profile.equipments}
 						</Typography>
 					</div>
 					<div style={{ marginTop: ".5rem" }}>
-						{facebook && (
-							<FacebookIcon style={{ fill: "blue", cursor: "pointer" }} />
+						{profile.social && profile.social.facebook && (
+							<a
+								target='_blank'
+								rel='noreferrer'
+								href={"https://" + profile.social.facebook}
+							>
+								<FacebookIcon style={{ fill: "blue", cursor: "pointer" }} />
+							</a>
 						)}
-						{twitter && (
-							<TwitterIcon style={{ fill: "blue", cursor: "pointer" }} />
+						{profile.social && profile.social.twitter && (
+							<a
+								target='_blank'
+								rel='noreferrer'
+								href={"https://" + profile.social.twitter}
+							>
+								<TwitterIcon style={{ fill: "blue", cursor: "pointer" }} />
+							</a>
 						)}
-						{instagram && (
-							<InstagramIcon style={{ fill: "orange", cursor: "pointer" }} />
+						{profile.social && profile.social.instagram && (
+							<a
+								target='_blank'
+								rel='noreferrer'
+								href={"https://" + profile.social.instagram}
+							>
+								<InstagramIcon style={{ fill: "orange", cursor: "pointer" }} />
+							</a>
 						)}
 					</div>
 
@@ -495,7 +614,7 @@ const Profile = ({
 				{/* <Typography style={{ textAlign: "center" }} variant='h5'>
 					About
 				</Typography> */}
-				<Typography variant='subtitle1'>{profile && profile.bio}</Typography>
+				<Typography variant='subtitle1'>{profile.bio}</Typography>
 			</Container>
 			<Divider style={{ width: "20%", margin: " 2rem  auto" }} />
 		</Fragment>

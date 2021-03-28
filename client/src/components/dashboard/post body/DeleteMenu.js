@@ -1,12 +1,15 @@
 import React from "react";
-import IconButton from "@material-ui/core/IconButton";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+
 import { connect } from "react-redux";
 import { deletePost } from "../../../actions/post";
 import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
+
+//Material-UI
+import IconButton from "@material-ui/core/IconButton";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 const ITEM_HEIGHT = 48;
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-import setAuthToken from "../utils/setAuthToken";
+
 import { setAlert } from "./alert";
 
 import {
@@ -13,6 +13,9 @@ import {
 //Get current profile
 
 export const getCurrentProfile = () => async (dispatch) => {
+	// dispatch({
+	// 	type: CLEAR_PROFILE,
+	// });
 	try {
 		const res = await axios.get("/api/profile/me");
 
@@ -33,9 +36,7 @@ export const getCurrentProfile = () => async (dispatch) => {
 
 //Create profile
 
-export const createProfile = (formData, history, edit = false) => async (
-	dispatch
-) => {
+export const createProfile = (formData) => async (dispatch) => {
 	dispatch({
 		type: CLEAR_PROFILE,
 	});
@@ -51,6 +52,7 @@ export const createProfile = (formData, history, edit = false) => async (
 			type: GET_PROFILE,
 			payload: res.data,
 		});
+		dispatch(getCurrentProfile());
 	} catch (error) {
 		const errors = error.response.data.errors;
 
@@ -114,6 +116,10 @@ export const getProfileById = (id) => async (dispatch) => {
 				msg: error.response.data.msg,
 				status: error.response.status,
 			},
+		});
+
+		dispatch({
+			type: CLEAR_PROFILE,
 		});
 	}
 };
