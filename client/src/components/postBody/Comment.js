@@ -7,7 +7,7 @@ import {
 	Button,
 } from "@material-ui/core";
 import { connect } from "react-redux";
-import { deleteComment } from "../../../actions/post";
+import { deleteComment } from "../../actions/post";
 import PropTypes from "prop-types";
 import Moment from "react-moment";
 

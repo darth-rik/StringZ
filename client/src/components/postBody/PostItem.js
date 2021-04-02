@@ -6,7 +6,7 @@ import Comment from "./Comment";
 import { Link } from "react-router-dom";
 import Moment from "react-moment";
 import { connect } from "react-redux";
-import { addLike, removeLike, addComment } from "../../../actions/post";
+import { addLike, removeLike, addComment } from "../../actions/post";
 import PropTypes from "prop-types";
 
 //Material-UI

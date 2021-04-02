@@ -15,12 +15,11 @@ import { Divider } from "@material-ui/core";
 const useStyles = makeStyles((theme) => ({
 	mobileSection: {
 		padding: "1rem 2rem",
-		backgroundColor: "",
 		display: "flex",
 		flexDirection: "column",
 		justifyItems: "center",
 
-		[theme.breakpoints.up("lg")]: {
+		[theme.breakpoints.up("md")]: {
 			display: "grid",
 			gridTemplateColumns: "repeat(3,1fr)",
 			gap: "1rem",
@@ -55,7 +54,6 @@ const NotificationItems = ({ notification, readNotification, close }) => {
 					style={{
 						textAlign: "center",
 						whiteSpace: "pre-line",
-						padding: "1rem",
 					}}
 				>
 					<strong>{notification.name}</strong> has{" "}

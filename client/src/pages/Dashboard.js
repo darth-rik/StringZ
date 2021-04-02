@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { loadUser } from "../actions/auth";
 import PropTypes from "prop-types";
 import { getPosts } from "../actions/post";
-import PostItem from "../components/dashboard/post body/PostItem";
+import PostItem from "../components/postBody/PostItem";
 import Spinner from "../components/layouts/Spinner";
 
 const Dashboard = ({

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { connect } from "react-redux";
-import { deletePost } from "../../../actions/post";
+import { deletePost } from "../../actions/post";
 import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 

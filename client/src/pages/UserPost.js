@@ -3,7 +3,7 @@ import { getPost } from "../actions/post";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import Spinner from "../components/layouts/Spinner";
-import PostItem from "../components/dashboard/post body/PostItem";
+import PostItem from "../components/postBody/PostItem";
 import { Container } from "@material-ui/core";
 
 const UserPost = ({ getPost, post: { post, loading }, match }) => {

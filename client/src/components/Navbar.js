@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-import PostInput from "./PostInput";
+import PostInput from "./dashboard/PostInput";
 
 import { connect } from "react-redux";
 import { logout } from "../actions/auth";
