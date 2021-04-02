@@ -2,20 +2,25 @@ import React from "react";
 import Typography from "@material-ui/core/Typography";
 import NotificationItems from "./NotificationItems";
 import { Divider } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles(() => ({
+	notificationBody: {
+		width: "100%",
+		maxHeight: "70vh",
+		overflowY: "scroll",
+	},
+}));
 
 const Notification = ({ profiles: { notification }, close }) => {
 	const closeNotif = () => {
 		close();
 	};
 
+	const classes = useStyles();
+
 	return (
-		<div
-			style={{
-				width: "100%",
-				maxHeight: "70vh",
-				overflowY: "scroll",
-			}}
-		>
+		<div className={classes.notificationBody}>
 			<div
 				style={{
 					color: "blue",

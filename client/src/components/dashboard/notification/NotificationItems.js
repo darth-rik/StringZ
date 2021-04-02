@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 		flexDirection: "column",
 		justifyItems: "center",
 
-		[theme.breakpoints.up("md")]: {
+		[theme.breakpoints.up("lg")]: {
 			display: "grid",
 			gridTemplateColumns: "repeat(3,1fr)",
 			gap: "1rem",
@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
 const NotificationItems = ({ notification, readNotification, close }) => {
 	const classes = useStyles();
 
-	const onClick = async () => {
+	const onClick = () => {
 		readNotification(notification._id);
 		close();
 	};
@@ -51,9 +51,14 @@ const NotificationItems = ({ notification, readNotification, close }) => {
 					// src=''
 					alt=''
 				/>
-				<Typography style={{ textAlign: "center" }}>
-					{/* {el.name} {el.commentId ? "commented" : "liked"} your post */}
-					{notification.name} has{" "}
+				<Typography
+					style={{
+						textAlign: "center",
+						whiteSpace: "pre-line",
+						padding: "1rem",
+					}}
+				>
+					<strong>{notification.name}</strong> has{" "}
 					{notification.message === "like" ? "liked" : "commented on"} your post
 				</Typography>
 				<Typography variant='caption'>

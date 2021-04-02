@@ -41,6 +41,19 @@ const useStyles = makeStyles((theme) => ({
 		marginRight: ".5rem",
 		cursor: "pointer",
 	},
+	postAvatar: {
+		height: "5rem",
+		width: "5rem",
+		marginRight: "1.5rem",
+	},
+
+	postText: {
+		width: "90%",
+		margin: "auto",
+		marginBottom: "1rem",
+		lineHeight: "1.5rem",
+		wordWrap: "break-word",
+	},
 }));
 const PostItem = ({
 	auth,
@@ -117,7 +130,7 @@ const PostItem = ({
 				>
 					<Link to={`/profile/${user}`}>
 						<Avatar
-							style={{ height: "5rem", width: "5rem", marginRight: "1.5rem" }}
+							className={classes.postAvatar}
 							src={avatar && `../images/${avatar}`}
 							alt=''
 						/>
@@ -130,16 +143,7 @@ const PostItem = ({
 					</div>
 				</div>
 
-				<Typography
-					style={{
-						width: "90%",
-						margin: "auto",
-						marginBottom: "1rem",
-						lineHeight: "1.5rem",
-						wordWrap: "break-word",
-					}}
-					variant='subtitle1'
-				>
+				<Typography className={classes.postText} variant='subtitle1'>
 					{text}
 				</Typography>
 
@@ -182,7 +186,7 @@ const PostItem = ({
 			<Container
 				style={{
 					margin: comment ? "2rem 0" : "0",
-					maxHeight: comment ? commentPanel.current.scrollHeight + "px" : "0",
+					height: comment ? "auto" : "0",
 					transition: "all .3s ease-out",
 					overflow: "hidden",
 				}}

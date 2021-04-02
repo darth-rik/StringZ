@@ -608,12 +608,8 @@ const Profile = ({
 					</div> */}
 				</div>
 			</Container>
-			{/* <Divider style={{ width: "70%", margin: "auto" }} /> */}
 
 			<Container maxWidth='md' style={{ textAlign: "center", maxWidth: "90%" }}>
-				{/* <Typography style={{ textAlign: "center" }} variant='h5'>
-					About
-				</Typography> */}
 				<Typography variant='subtitle1'>{profile.bio}</Typography>
 			</Container>
 			<Divider style={{ width: "20%", margin: " 2rem  auto" }} />
